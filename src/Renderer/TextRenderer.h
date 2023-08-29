@@ -1,6 +1,7 @@
 #pragma once
 
 #include <SDL3/SDL.h>
+#include "Utility/Profiler.h"
 #include <Engine/ResourceManager.h>
 
 struct Point {

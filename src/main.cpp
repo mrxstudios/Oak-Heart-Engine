@@ -8,6 +8,7 @@
 #include <SDL3/SDL_main.h>
 #include <SDL3_image/SDL_image.h>
 
+#include "Input/InputManager.h"
 #include "Renderer/Raster.h"
 #include "Renderer/TextRenderer.h"
 #include "Utility/Profiler.h"
@@ -22,7 +23,7 @@ struct ARGB {
 
 Raster raster;
 
-struct SDLdata {
+struct OHE_Context {
     int RESOLUTION_WIDTH = 400;
     int RESOLUTION_HEIGHT = 300;
     int RESOLUTION_MULTIPLIER = 4;
@@ -36,6 +37,7 @@ struct SDLdata {
     SDL_bool fullscreen = SDL_bool::SDL_TRUE;
     SDL_Renderer* renderer;
 
+    InputManager* inputManager;
     ResourceManager* resourceManager;
     TextRenderer* textRenderer;
 
@@ -97,19 +99,19 @@ static inline void swap_pixels(Pixel& a, Pixel& b) {
 	b = swapPixel;
 }
 
-inline bool parse_sand(SDLdata& sdl_data, size_t& index) {
+inline bool parse_sand(OHE_Context& context, size_t& index) {
     Pixel& pixel = raster[index];
     Pixel swapPixel = Pixel{};
     if (!pixel.Exists()) return false;
     if (pixel.IsDynamic() && pixel.IsAwake()) {
-        if (index < sdl_data.PIXEL_LENGTH - 1 - sdl_data.VIEW_WIDTH) {
-            Pixel& pixel_below = raster[index + sdl_data.VIEW_WIDTH];
+        if (index < context.PIXEL_LENGTH - 1 - context.VIEW_WIDTH) {
+            Pixel& pixel_below = raster[index + context.VIEW_WIDTH];
             if (!pixel_below.Exists()) {
                 swap_pixels(pixel, pixel_below);
             }
             else {
-                Pixel& pixel_bottom_left = raster[index + sdl_data.VIEW_WIDTH - 1];
-                Pixel& pixel_bottom_right = raster[index + sdl_data.VIEW_WIDTH + 1];
+                Pixel& pixel_bottom_left = raster[index + context.VIEW_WIDTH - 1];
+                Pixel& pixel_bottom_right = raster[index + context.VIEW_WIDTH + 1];
                 if (pixel_bottom_left.Exists() && pixel_bottom_right.Exists()) {
                     pixel.SetAwake(false);
                 }
@@ -143,77 +145,77 @@ inline bool parse_sand(SDLdata& sdl_data, size_t& index) {
 
 
 
-void DrawPixels(SDLdata& sdl_data) {
+void DrawPixels(OHE_Context& context) {
     void* pixels = nullptr;
     int pitch = 0;
 
-    SDL_LockTexture(sdl_data.buffer, NULL, &pixels, &pitch);
+    SDL_LockTexture(context.buffer, NULL, &pixels, &pitch);
 
     ARGB* ARGBptr = reinterpret_cast<ARGB*>(pixels);
-    for (size_t i = 0; i < sdl_data.PIXEL_LENGTH; i++) {
+    for (size_t i = 0; i < context.PIXEL_LENGTH; i++) {
         Pixel &pixel = raster[i];
         if (pixel.Exists()) {
             if (pixel.IsAwake()) {
-                *ARGBptr = sdl_data.white;
+                *ARGBptr = context.white;
             }
             else {
                 *ARGBptr = ARGB{ 255,255,0,0 };
             }
         }
         else {
-            *ARGBptr = sdl_data.black;
+            *ARGBptr = context.black;
         }
         ARGBptr++;
     }
 
-    SDL_UnlockTexture(sdl_data.buffer);
+    SDL_UnlockTexture(context.buffer);
 }
 
-void DrawDebug(SDLdata& sdl_data) {
+void DrawDebug(OHE_Context& context) {
     SDL_FRect rect = SDL_FRect{ 100,100,100,100 };
-    SDL_SetRenderDrawColor(sdl_data.renderer, 0, 255, 0, 0);
-    SDL_RenderRect(sdl_data.renderer, &rect);
+    SDL_SetRenderDrawColor(context.renderer, 0, 255, 0, 0);
+    SDL_RenderRect(context.renderer, &rect);
 }
 
-void RenderGame(SDLdata& sdl_data) {
-    DrawPixels(sdl_data);
-    SDL_RenderTexture(sdl_data.renderer, sdl_data.buffer, &sdl_data.textureSrcRect, &sdl_data.textureDstRect);
+void RenderGame(OHE_Context& context) {
+    DrawPixels(context);
+    SDL_RenderTexture(context.renderer, context.buffer, &context.textureSrcRect, &context.textureDstRect);
 }
 
-void RenderDebug(SDLdata& sdl_data) {
-    if (sdl_data.debugFlags[1]) sdl_data.textRenderer->Render(sdl_data.fpsTextBuffer, Point{ sdl_data.RESOLUTION_WIDTH - 20,20 }, SDL_Color{ 0,255,0,255 },12, TextAlignment::Right);
-    if (sdl_data.debugFlags[2]) sdl_data.textRenderer->Render(sdl_data.msTextBuffer, Point{sdl_data.RESOLUTION_WIDTH - 32,34}, SDL_Color{ 0,255,0,255 }, 12, TextAlignment::Right);
-    if (sdl_data.debugFlags[3]) DrawDebug(sdl_data);
+void RenderDebug(OHE_Context& context) {
+    if (context.debugFlags[1]) context.textRenderer->Render(context.fpsTextBuffer, Point{ context.RESOLUTION_WIDTH - 20,20 }, SDL_Color{ 0,255,0,255 },12, TextAlignment::Right);
+    if (context.debugFlags[2]) context.textRenderer->Render(context.msTextBuffer, Point{context.RESOLUTION_WIDTH - 32,34}, SDL_Color{ 0,255,0,255 }, 12, TextAlignment::Right);
+    if (context.debugFlags[3]) DrawDebug(context);
 }
 
-void Render(SDLdata& sdl_data) {
-    RenderGame(sdl_data);
-    RenderDebug(sdl_data);
-    SDL_RenderPresent(sdl_data.renderer);
+void Render(OHE_Context& context) {
+    RenderGame(context);
+    RenderDebug(context);
+    SDL_RenderPresent(context.renderer);
 }
 
-void Physics(SDLdata& sdl_data, double elapsed) {
+void Physics(OHE_Context& context, double elapsed) {
 
-    for (size_t i = sdl_data.PIXEL_LENGTH - 1; i != SIZE_MAX; i--) {
-        parse_sand(sdl_data, i);
+    for (size_t i = context.PIXEL_LENGTH - 1; i != SIZE_MAX; i--) {
+        parse_sand(context, i);
     }
 }
 
-void UI(SDLdata& sdl_data) {
+void UI(OHE_Context& context) {
     /*char buffer[50];
     sprintf_s(buffer, "%d fps", sdl_data.fps);*/
 }
 
-void Tick(SDLdata& sdl_data, double elapsed) {
-    Physics(sdl_data, elapsed);
+void Tick(OHE_Context& context, double elapsed) {
+    Physics(context, elapsed);
     //UI(sdl_data);
-    Render(sdl_data);
+    Render(context);
 }
 
-void InitGame(SDLdata& sdl_data) {
+void InitGame(OHE_Context& context) {
 
     std::srand(std::time(nullptr));
-    raster = Raster(sdl_data.VIEW_WIDTH, sdl_data.VIEW_HEIGHT);
+    raster = Raster(context.VIEW_WIDTH, context.VIEW_HEIGHT);
 
     /*for (size_t i = 0; i < sdl_data.PIXEL_LENGTH; i++) {
         unsigned char gradient = ((float)i / (float)sdl_data.PIXEL_LENGTH) * 255.f;
@@ -243,8 +245,8 @@ void InitGame(SDLdata& sdl_data) {
     const int rectLeft = 200;      // Left boundary of the rectangle
     const int rectRight = 800; // Right boundary of the rectangle
 
-    for (int x = 0; x < sdl_data.VIEW_WIDTH; x++) {
-        for (int y = 0; y < sdl_data.VIEW_HEIGHT; y++) {
+    for (int x = 0; x < context.VIEW_WIDTH; x++) {
+        for (int y = 0; y < context.VIEW_HEIGHT; y++) {
             if (x >= rectLeft && x <= rectRight) {
                 unsigned char noise = std::rand() % 50;
                 if (std::rand() % 5 == 0) {
@@ -264,42 +266,43 @@ void InitGame(SDLdata& sdl_data) {
     }*/
 }
 
-SDLdata& InitSDL() {
-    SDLdata sdl_data;
+OHE_Context& InitSDL() {
+    OHE_Context context;
 
     SDL_Init(SDL_INIT_VIDEO);
 
-    sdl_data.window = SDL_CreateWindow("PixelGame", sdl_data.RESOLUTION_WIDTH, sdl_data.RESOLUTION_HEIGHT, 0);
-    sdl_data.renderer = SDL_CreateRenderer(sdl_data.window, NULL, SDL_RENDERER_ACCELERATED);
+    context.window = SDL_CreateWindow("PixelGame", context.RESOLUTION_WIDTH, context.RESOLUTION_HEIGHT, 0);
+    context.renderer = SDL_CreateRenderer(context.window, NULL, SDL_RENDERER_ACCELERATED);
     
-    SDL_SetWindowFullscreen(sdl_data.window, sdl_data.fullscreen);
-    SDL_GetCurrentRenderOutputSize(sdl_data.renderer, &sdl_data.RESOLUTION_WIDTH, &sdl_data.RESOLUTION_HEIGHT);
-    sdl_data.ApplyResolution();
+    SDL_SetWindowFullscreen(context.window, context.fullscreen);
+    SDL_GetCurrentRenderOutputSize(context.renderer, &context.RESOLUTION_WIDTH, &context.RESOLUTION_HEIGHT);
+    context.ApplyResolution();
 
-    sdl_data.buffer = SDL_CreateTexture(sdl_data.renderer,
+    context.buffer = SDL_CreateTexture(context.renderer,
         SDL_PIXELFORMAT_BGRA8888,
         SDL_TEXTUREACCESS_STREAMING,
-        sdl_data.VIEW_WIDTH,
-        sdl_data.VIEW_HEIGHT);
+        context.VIEW_WIDTH,
+        context.VIEW_HEIGHT);
 
-    sdl_data.resourceManager = new ResourceManager(sdl_data.renderer);
+    context.resourceManager = new ResourceManager(context.renderer);
     
-    sdl_data.textRenderer = new TextRenderer(sdl_data.renderer, sdl_data.resourceManager);
-    sdl_data.textRenderer->LoadFontTexture("T_Font_ascii", "assets/textures/ascii.png", 16);
+    context.textRenderer = new TextRenderer(context.renderer, context.resourceManager);
+    context.textRenderer->LoadFontTexture("T_Font_ascii", "assets/textures/ascii.png", 16);
 
-    return sdl_data;
+    return context;
 }
 
-void DestroySDL(SDLdata& sdl_data) {
-    delete sdl_data.resourceManager;
-    delete sdl_data.textRenderer;
+void DestroySDL(OHE_Context& context) {
+    delete context.resourceManager;
+    delete context.textRenderer;
 }
 
 int main(int argc, char* argv[]) {
-    SDLdata sdl_data = InitSDL();
+    OHE_Context context = InitSDL();
+
+    context.inputManager = new InputManager();
 
     bool quit = false;
-    SDL_Event event;
 
     const int targetFPS = -1;
     const std::chrono::milliseconds frameDuration(1000 / targetFPS);
@@ -308,59 +311,24 @@ int main(int argc, char* argv[]) {
     auto lastFrameTime = std::chrono::high_resolution_clock::now();
     auto lastDebugTime = std::chrono::high_resolution_clock::now();
 
-    InitGame(sdl_data);
+    InitGame(context);
 
     while (!quit) {
         auto currentTime = std::chrono::high_resolution_clock::now();
         auto elapsed = std::chrono::duration_cast<std::chrono::microseconds>(currentTime - lastFrameTime);
         auto debugElapsed = std::chrono::duration_cast<std::chrono::microseconds>(currentTime - lastDebugTime);
 
-        while (SDL_PollEvent(&event)) {
-            switch (event.type) {
-            case SDL_EVENT_QUIT:
-                quit = true;
-                break;
-            case SDL_EVENT_KEY_DOWN:
-				if (event.key.keysym.scancode == SDL_SCANCODE_ESCAPE) { // Escape
-                    quit = true;
-                    break;
-				}
-                if (event.key.keysym.scancode == SDL_SCANCODE_0) { // 0
-                    sdl_data.debugFlags[0] = !sdl_data.debugFlags[0];
-                }
-                if (event.key.keysym.scancode == SDL_SCANCODE_1) { // 1
-                    sdl_data.debugFlags[1] = !sdl_data.debugFlags[1];
-                }
-                if (event.key.keysym.scancode == SDL_SCANCODE_2) { // 2
-                    sdl_data.debugFlags[2] = !sdl_data.debugFlags[2];
-                }
-                if (event.key.keysym.scancode == SDL_SCANCODE_3) { // 3
-                    sdl_data.debugFlags[3] = !sdl_data.debugFlags[3];
-                }
-                if (event.key.keysym.scancode == SDL_SCANCODE_4) { // 4
-                    sdl_data.debugFlags[4] = !sdl_data.debugFlags[4];
-                }
-                if (event.key.keysym.scancode == SDL_SCANCODE_5) { // 5
-                    sdl_data.debugFlags[5] = !sdl_data.debugFlags[5];
-                }
-                if (event.key.keysym.scancode == SDL_SCANCODE_6) { // 6
-                    sdl_data.debugFlags[6] = !sdl_data.debugFlags[6];
-                }
-                if (event.key.keysym.scancode == SDL_SCANCODE_7) { // 7
-                    sdl_data.debugFlags[7] = !sdl_data.debugFlags[7];
-                }
-                if (event.key.keysym.scancode == SDL_SCANCODE_8) { // 8
-                    sdl_data.debugFlags[8] = !sdl_data.debugFlags[8];
-                }
-                if (event.key.keysym.scancode == SDL_SCANCODE_9) { // 9
-                    sdl_data.debugFlags[9] = !sdl_data.debugFlags[9];
-                }
-                if (event.key.keysym.scancode == SDL_SCANCODE_SPACE) { // Spacebar
-                }
-                break;
-            }
+        context.inputManager->PollEvents();
 
+        if (context.inputManager->IsQuitRequested() || context.inputManager->IsPressed_Escape()) {
+            quit = true;
+            break;
         }
+
+        if (context.inputManager->IsPressed_1()) context.debugFlags[1] = !context.debugFlags[1];
+        if (context.inputManager->IsPressed_2()) context.debugFlags[2] = !context.debugFlags[2];
+        if (context.inputManager->IsPressed_3()) context.debugFlags[3] = !context.debugFlags[3];
+        
         if (elapsed >= frameDuration) {
             lastFrameTime = currentTime;
             frameCount++;
@@ -370,22 +338,22 @@ int main(int argc, char* argv[]) {
 
                 // Calculate frames per second
                 float fps = static_cast<float>(frameCount) * 1000000 / debugElapsed.count();
-                sprintf_s(sdl_data.fpsTextBuffer, "%.1f fps", fps);
+                sprintf_s(context.fpsTextBuffer, "%.1f fps", fps);
 
                 // Display elapsed milliseconds
                 float elapsedMicroseconds = (float)debugElapsed.count() / 1000 / frameCount;
-                sprintf_s(sdl_data.msTextBuffer, "%.3f ms", elapsedMicroseconds);
+                sprintf_s(context.msTextBuffer, "%.3f ms", elapsedMicroseconds);
 
                 frameCount = 0;  // Reset frame count
             }
 
-            Tick(sdl_data, elapsed.count());
+            Tick(context, elapsed.count());
         }
     }
 
-    DestroySDL(sdl_data);
-    SDL_DestroyRenderer(sdl_data.renderer);
-    SDL_DestroyWindow(sdl_data.window);
+    DestroySDL(context);
+    SDL_DestroyRenderer(context.renderer);
+    SDL_DestroyWindow(context.window);
     SDL_Quit();
 
     return 0;

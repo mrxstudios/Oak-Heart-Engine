@@ -48,6 +48,7 @@ void TextRenderer::Render(
         if (alignment == TextAlignment::Right) {
             dest.x -= length * fontSize;
         }
+
         SDL_SetTextureColorMod(fontTexture, color.r, color.g, color.b);
         SDL_RenderTexture(renderer, fontTexture, &src, &dest);
     }

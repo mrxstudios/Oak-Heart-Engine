@@ -4,12 +4,6 @@
 [submodule "vendor/sol2"]
 	path = vendor/sol2
 	url = https://github.com/ThePhD/sol2.git
-[submodule "vendor/SDL_ttf"]
-	path = vendor/SDL_ttf
-	url = https://github.com/libsdl-org/SDL_ttf.git
-[submodule "vendor/--recursive"]
-	path = vendor/--recursive
-	url = https://github.com/libsdl-org/SDL_image.git
 [submodule "vendor/SDL_image"]
 	path = vendor/SDL_image
 	url = https://github.com/libsdl-org/SDL_image.git

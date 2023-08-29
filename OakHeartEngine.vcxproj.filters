@@ -109,4 +109,7 @@
       <Filter>Source Files\Renderer</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="src\Input\EventsOverview.txt" />
+  </ItemGroup>
 </Project>
