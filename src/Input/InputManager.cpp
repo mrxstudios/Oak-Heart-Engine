@@ -3,14 +3,6 @@
 #include "InputManager.h"
 
 InputManager::InputManager() {
-    // Fills keyboardState with 512x false;
-    std::fill_n(keyState, SDL_NUM_SCANCODES, false);
-    std::fill_n(prevKeyState, SDL_NUM_SCANCODES, false);
-    std::fill_n(keyPressedHandledState, SDL_NUM_SCANCODES, false);
-    std::fill_n(keyReleasedHandledState, SDL_NUM_SCANCODES, false);
-    std::fill_n(mouseButtonState, 5, false);
-    std::fill_n(mouseHandledState, 5, false);
-
     mousePosition.x = 0;
     mousePosition.y = 0;
 }
@@ -18,7 +10,7 @@ InputManager::InputManager() {
 void InputManager::PollEvents() {
     // Store the previous state.
     for (size_t i = 0; i < SDL_NUM_SCANCODES; i++) {
-        prevKeyState[i] = keyState[i];
+        keyStates[i].prevState = keyStates[i].state;
     }
 
     // Handle SDL events
@@ -29,16 +21,16 @@ void InputManager::PollEvents() {
             quit = true;
             break;
         case SDL_EVENT_KEY_DOWN:
-            keyState[event.key.keysym.scancode] = true;
+            keyStates[event.key.keysym.scancode].state = true;
             break;
         case SDL_EVENT_KEY_UP:
-            keyState[event.key.keysym.scancode] = false;
+            keyStates[event.key.keysym.scancode].state = false;
             break;
         case SDL_EVENT_MOUSE_BUTTON_DOWN:
-            mouseButtonState[event.button.button] = true;
+            mouseStates[event.button.button].state = true;
             break;
         case SDL_EVENT_MOUSE_BUTTON_UP:
-            mouseButtonState[event.button.button] = false;
+            mouseStates[event.button.button].state = false;
             break;
         case SDL_EVENT_MOUSE_MOTION:
             mousePosition.x = event.motion.x;
@@ -54,56 +46,42 @@ bool InputManager::IsQuitRequested() const{
     return quit;
 }
 
-bool InputManager::IsKeyDown(SDL_Scancode key) const {
-    return keyState[key];
+bool InputManager::IsDown(inputState* inputStates, int key) {
+    return inputStates[key].state;
 }
 
-bool InputManager::IsKeyPressed(SDL_Scancode key) {
-    if (keyState[key]) {
-        if (!prevKeyState[key]) {
-            if (!keyPressedHandledState[key]) {
-                keyPressedHandledState[key] = true;
+bool InputManager::IsUp(inputState* inputStates, int key) {
+    return !inputStates[key].state;
+}
+
+bool InputManager::IsPressed(inputState* inputStates, int key) {
+    if (inputStates[key].state) {
+        if (!inputStates[key].prevState) {
+            if (!inputStates[key].pressedHandled) {
+                inputStates[key].pressedHandled = true;
                 return true;
             }
         }
         else {
-            keyPressedHandledState[key] = false;
+            inputStates[key].pressedHandled = false;
         }
     }
     return false;
 }
 
-bool InputManager::IsKeyReleased(SDL_Scancode key) {
-    if (!keyState[key]) {
-        if (prevKeyState[key]) {
-            if (!keyReleasedHandledState[key]) {
-                keyReleasedHandledState[key] = true;
+bool InputManager::IsReleased(inputState* inputStates, int key) {
+    if (!inputStates[key].state) {
+        if (inputStates[key].prevState) {
+            if (!inputStates[key].releasedHandled) {
+                inputStates[key].releasedHandled = true;
                 return true;
             }
         }
         else {
-            keyReleasedHandledState[key] = false;
+            inputStates[key].releasedHandled = false;
         }
     }
     return false;
-}
-
-bool InputManager::IsMouseButtonPressed(Uint8 button, bool handle) {
-    if (mouseButtonState[button]) {
-        if (mouseHandledState[button] == false) {
-            if (handle) {
-                mouseHandledState[button] = true;
-            }
-            return true;
-        }
-        else {
-            return false; // Key is down but has already been "handled"
-        }
-    }
-    else {
-        mouseHandledState[button] = false; // Reset if the key is up
-        return false;
-    }
 }
 
 SDL_Point InputManager::GetMousePosition() {
