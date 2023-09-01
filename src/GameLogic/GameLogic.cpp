@@ -1,76 +1,66 @@
 #include "GameLogic.h"
-/*
-// Constructor
-GameLogic::GameLogic() {
-	// Initialize game logic, entities, player, etc.
-}
 
-// Destructor
+GameLogic::GameLogic(Context* context) : context(context) {};
+
 GameLogic::~GameLogic() {
-	// Clean up game logic resources
+    // Destroy whatever has been created in here
 }
 
-// Update game logic
-void GameLogic::Update(float deltaTime) {
-	// Update player, entities, physics, AI, etc.
-	UpdatePlayer(deltaTime);
-	UpdateEntities(deltaTime);
-	UpdatePhysics(deltaTime);
-	UpdateAI(deltaTime);
+void GameLogic::InitGame() {
+
+    SpawnRectangleOfSand();
+    /*for (size_t i = 0; i < sdl_data.PIXEL_LENGTH; i++) {
+        unsigned char gradient = ((float)i / (float)sdl_data.PIXEL_LENGTH) * 255.f;
+        unsigned char inv_gradient = 255 - gradient;
+        unsigned char noise = std::rand() % 100;
+        raster.emplace_back(Pixel{ std::rand() % 5 == 0 , ARGB{255,255,noise,noise} });
+        //raster.emplace_back(Pixel{ std::rand() % 5 == 0 , BGRA{255,255,255,255} });
+    }*/
+
+    /*const int centerX = sdl_data.VIEW_WIDTH / 4;
+    const int centerY = sdl_data.VIEW_HEIGHT / 4;
+    const int radius = 50; // Adjust this radius as needed
+
+    for (int y = 0; y < sdl_data.VIEW_WIDTH; ++y) {
+        for (int x = 0; x < sdl_data.VIEW_HEIGHT; ++x) {
+            int distance = static_cast<int>(std::sqrt((x - centerX) * (x - centerX) + (y - centerY) * (y - centerY)));
+
+            if (distance <= radius) {
+                if (std::rand() % 5 == 0) {
+                    coord c = coord{ x,y };
+                    raster.GetPixel(c).SetValue(7);
+                }
+            }
+        }
+    }*/
+
+    /*for (int y = 0; y < sdl_data.VIEW_HEIGHT; ++y) {
+        for (int x = 0; x < sdl_data.VIEW_WIDTH; ++x) {
+            if (x % 10 > 5) {
+                coord c = coord{ x,y };
+                raster.GetPixel(c).SetValue(7);
+            }
+        }
+    }*/
 }
 
-// Handle game events
-void GameLogic::HandleEvent(const Event& event) {
-	// Handle events like player input, collisions, etc.
-	if (event.type == EventType::KeyDown) {
-		if (event.key == KeyCode::Space) {
-			player.Jump();
-		}
-	}
-	// Handle other events...
+void GameLogic::Tick(double deltaTime) {
+
 }
 
-// Render the game
-void GameLogic::Render(Renderer& renderer) {
-	// Render game objects, UI, etc.
-	RenderEntities(renderer);
-	RenderUI(renderer);
+void GameLogic::SpawnRectangleOfSand() {
+    const int rectLeft = 200;      // Left boundary of the rectangle
+    const int rectRight = 800; // Right boundary of the rectangle
+
+    for (int x = 0; x < context->VIEW_WIDTH; x++) {
+        for (int y = 0; y < context->VIEW_HEIGHT; y++) {
+            if (x >= rectLeft && x <= rectRight) {
+                unsigned char noise = std::rand() % 50;
+                if (std::rand() % 5 == 0) {
+                    coord c = coord{ x,y };
+                    context->raster->GetPixel(c).SetValue(7);
+                }
+            }
+        }
+    }
 }
-
-// Update the player
-void GameLogic::UpdatePlayer(float deltaTime) {
-	player.Update(deltaTime);
-}
-
-// Update game entities
-void GameLogic::UpdateEntities(float deltaTime) {
-	for (Entity& entity : entities) {
-		entity.Update(deltaTime);
-	}
-}
-
-// Update physics simulation
-void GameLogic::UpdatePhysics(float deltaTime) {
-	physicsSystem.Update(deltaTime);
-}
-
-// Update AI behaviors
-void GameLogic::UpdateAI(float deltaTime) {
-	// Update AI logic, behaviors, decisions, etc.
-}
-
-// Render game entities
-void GameLogic::RenderEntities(Renderer& renderer) {
-	for (const Entity& entity : entities) {
-		renderer.RenderEntity(entity);
-	}
-}
-
-// Render UI elements
-void GameLogic::RenderUI(Renderer& renderer) {
-	uiManager.Render(renderer);
-}
-
-// Other methods related to managing game logic
-
-*/

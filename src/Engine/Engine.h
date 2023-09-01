@@ -1,23 +1,31 @@
 #pragma once
-/*
-#include <memory>
-#include "../GameState/GameState.h"
-#include "../Renderer/Renderer.h"
-#include "../Input/InputManager.h"
+
+#include <chrono>
+#include "Context.h"
+
+#include "Input/InputManager.h"
+#include "Renderer/Raster.h"
+#include "Renderer/TextRenderer.h"
+#include "GameLogic/GameLogic.h"
+#include "Physics/Physics.h"
 
 class Engine {
 public:
-	Engine();
-	~Engine();
+    Engine();
+    ~Engine();
 
-	void Run();
-	void SetCurrentState(std::unique_ptr<GameState> newState);
-	void Exit();
+    void Initialize();
+    void Run();
+    void Terminate();
 
 private:
-	bool running;
-	std::unique_ptr<GameState> currentState;
-	std::unique_ptr<Renderer> renderer;
-	std::unique_ptr<InputManager> inputManager;
+    Context* context;
+    std::chrono::high_resolution_clock::time_point lastFrameTime;
+    std::chrono::high_resolution_clock::time_point lastDebugTime;
+    int frameCount;
+
+    void Tick(double deltaTime);
+    void Render();
+    void RenderGame();
+    void RenderDebug();
 };
-*/

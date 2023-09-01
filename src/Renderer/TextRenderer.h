@@ -2,7 +2,11 @@
 
 #include <SDL3/SDL.h>
 #include "Utility/Profiler.h"
+#include <Engine/Context.h>
 #include <Engine/ResourceManager.h>
+
+class Context;
+class ResourceManager;
 
 struct Point {
 	int x;
@@ -18,17 +22,15 @@ enum TextAlignment {
 class TextRenderer {
 
 private:
-	SDL_Renderer* renderer = nullptr;
+	Context* context;
 	SDL_Texture* fontTexture = nullptr;
-	ResourceManager* resourceManager = nullptr;
 
 	int fontSize = 12;
 	int gridSize = 16;
 	TextAlignment alignment = TextAlignment::Left;
 
 public:
-	TextRenderer() {};
-	TextRenderer(SDL_Renderer* renderer, ResourceManager* resourceManager);
+	TextRenderer(Context* context);
 
 	void LoadFontTexture(const std::string& id, const std::string& filePath, int gridSize);
 

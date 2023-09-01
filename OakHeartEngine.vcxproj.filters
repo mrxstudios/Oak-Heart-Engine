@@ -34,6 +34,12 @@
     <Filter Include="Source Files\Utility">
       <UniqueIdentifier>{b4c67bcb-20a4-4641-8471-5d837b8ec316}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Debug">
+      <UniqueIdentifier>{5e395bfd-e268-4e42-a0c0-2a044401735b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Physics">
+      <UniqueIdentifier>{a7bcfba9-1601-47d0-9268-8c99407f3438}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -68,6 +74,15 @@
     </ClCompile>
     <ClCompile Include="src\Engine\ResourceManager.cpp">
       <Filter>Source Files\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Debug\Debug.cpp">
+      <Filter>Source Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\Context.cpp">
+      <Filter>Source Files\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Physics\Physics.cpp">
+      <Filter>Source Files\Physics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -107,6 +122,15 @@
     </ClInclude>
     <ClInclude Include="src\Renderer\Renderer.h">
       <Filter>Source Files\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Debug\Debug.h">
+      <Filter>Source Files\Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\Context.h">
+      <Filter>Source Files\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Physics\Physics.h">
+      <Filter>Source Files\Physics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

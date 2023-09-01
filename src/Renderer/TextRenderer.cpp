@@ -1,12 +1,10 @@
 #include "TextRenderer.h"
 
-TextRenderer::TextRenderer(SDL_Renderer* renderer, ResourceManager* resourceManager)
-    : renderer(renderer), resourceManager(resourceManager) {
-};
+TextRenderer::TextRenderer(Context* context) : context(context) {};
 
 void TextRenderer::LoadFontTexture(const std::string& id, const std::string& filePath, int gridSize) {
-    resourceManager->LoadTexture(id, filePath);
-    fontTexture = resourceManager->GetTexture(id);
+    context->resourceManager->LoadTexture(id, filePath);
+    fontTexture = context->resourceManager->GetTexture(id);
     this->gridSize = gridSize;
 };
 
@@ -50,6 +48,6 @@ void TextRenderer::Render(
         }
 
         SDL_SetTextureColorMod(fontTexture, color.r, color.g, color.b);
-        SDL_RenderTexture(renderer, fontTexture, &src, &dest);
+        SDL_RenderTexture(context->renderer, fontTexture, &src, &dest);
     }
 }

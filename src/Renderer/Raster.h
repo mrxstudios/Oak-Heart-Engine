@@ -15,9 +15,7 @@ public:
 	int size;
 	std::vector<Pixel> pixels;
 
-	Raster() {};
 	Raster(int width, int height);
-
 
 	Pixel& GetPixel(const int index);
 	Pixel& GetPixel(coord c);

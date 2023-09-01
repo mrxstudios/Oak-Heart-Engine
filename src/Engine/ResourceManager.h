@@ -4,19 +4,23 @@
 #include <string>
 #include <SDL3/SDL.h>
 #include <SDL3_image/SDL_image.h>
+#include "Engine/Context.h"
+
 //#include <SDL_mixer.h> // for audio
+
+class Context;
 
 class ResourceManager {
 private:
+    Context* context;
     std::map<std::string, SDL_Texture*> textureMap;
-    SDL_Renderer* renderer;
     //std::map<std::string, Mix_Chunk*> audioMap; // Assuming you're using SDL_Mixer
     //std::map<std::string, TTF_Font*> fontMap; // Assuming you're using SDL_TTF
     // ... other resource types like shaders
 
 public:
-    ResourceManager() {};
-    ResourceManager(SDL_Renderer* renderer);
+    //ResourceManager() {};
+    ResourceManager(Context* context);
     
     ~ResourceManager();
 

@@ -1,7 +1,7 @@
 #include "ResourceManager.h"
 
 // Constructor to initialize renderer
-ResourceManager::ResourceManager(SDL_Renderer* renderer) : renderer(renderer) {}
+ResourceManager::ResourceManager(Context* context) : context(context) {}
 
 // Destructor to clean up resources
 ResourceManager::~ResourceManager() {
@@ -23,7 +23,7 @@ bool ResourceManager::LoadTexture(const std::string& id, const std::string& file
         if (tempSurface == nullptr) {
             return false;
         }
-        SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, tempSurface);
+        SDL_Texture* texture = SDL_CreateTextureFromSurface(context->renderer, tempSurface);
         SDL_DestroySurface(tempSurface);
         if (texture != nullptr) {
             textureMap[id] = texture;

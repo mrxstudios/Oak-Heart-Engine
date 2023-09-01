@@ -1,6 +1,23 @@
 #pragma once
+#include "Engine/Context.h"
 
-#include <vector>
+class Context;
+
+class GameLogic {
+private:
+	Context* context;
+
+public:
+	GameLogic(Context* context);
+	~GameLogic();
+
+	void InitGame();
+	void Tick(double deltaTime);
+
+private:
+	void SpawnRectangleOfSand();
+};
+
 /*
 #include "../Player/Player.h"
 #include "../Entity/Entity.h"
