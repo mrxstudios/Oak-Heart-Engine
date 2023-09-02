@@ -5,27 +5,29 @@ Profiler& Profiler::GetInstance() {
     return instance;
 }
 
-void Profiler::Start(const std::string& name) {
-    profiles[name].startTime = std::chrono::high_resolution_clock::now();
+void Profiler::Start(const std::string& name,int updateRateInMilliseconds=1000) {
+    if (profiles[name].init) {
+        profiles[name].startTime = std::chrono::high_resolution_clock::now();
+        profiles[name].updateRateInMilliseconds = updateRateInMilliseconds;
+        profiles[name].init = false;
+    }
 }
 
 void Profiler::Stop(const std::string& name) {
     auto endTime = std::chrono::high_resolution_clock::now();
     auto& profile = profiles[name];
-    profile.duration += std::chrono::duration_cast<std::chrono::microseconds>(endTime - profile.startTime).count();
-    profile.count++;
-    PrintResults();
+    double elapsed = std::chrono::duration_cast<std::chrono::microseconds>(endTime - profile.startTime).count();
+    if (elapsed > profile.updateRateInMilliseconds * 1000) {
+        profile.averageElapsed = elapsed / profile.count;
+
+        profile.init = true;
+        profile.count = 1;
+    }
+    else {
+        profile.count++;
+    }
 }
 
-void Profiler::PrintResults() {
-    for (const auto& profile : profiles) {
-        const std::string& name = profile.first;
-        const ProfileData& data = profile.second;
-
-        if (data.count > 0) {
-            std::cout << "Profile '" << name << "': ";
-            std::cout << "Total Duration: " << data.duration << " us";
-            std::cout << " | Average Duration: " << (data.duration / data.count) << " us" << std::endl;
-        }
-    }
+long long Profiler::GetElapsedTime(const std::string& name) {
+    return profiles[name].averageElapsed;
 }

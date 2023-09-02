@@ -1,11 +1,15 @@
 #include "Raster.h"
 
 Raster::Raster(int width, int height) : width(width), height(height), size(width*height){
-	pixels.reserve(size);
+	pixels = new Pixel[size];
 
-	for (size_t i = 0; i < size; i++) {
-		pixels.emplace_back(Pixel{ 0 });
-	}
+	/*for (size_t i = 0; i < size; i++) {
+		pixels[i] = Pixel{ 0 };
+	}*/
+}
+
+Raster::~Raster() {
+	delete pixels;
 }
 
 Pixel& Raster::GetPixel(const int index) {

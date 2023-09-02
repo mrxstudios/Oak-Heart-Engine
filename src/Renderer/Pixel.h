@@ -7,7 +7,7 @@
 #define PIXEL_AWAKE 2
 
 struct Pixel {
-	uint32_t bitmask = 7;
+	uint32_t bitmask = 0;
 
 	/*
 	* 0000000 00000000 00000000 00000000

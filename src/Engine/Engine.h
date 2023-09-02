@@ -8,6 +8,7 @@
 #include "Renderer/TextRenderer.h"
 #include "GameLogic/GameLogic.h"
 #include "Physics/Physics.h"
+#include "Utility/Profiler.h"
 
 class Engine {
 public:
@@ -27,5 +28,4 @@ private:
     void Tick(double deltaTime);
     void Render();
     void RenderGame();
-    void RenderDebug();
 };

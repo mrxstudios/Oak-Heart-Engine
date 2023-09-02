@@ -1,10 +1,6 @@
 #include "Engine.h"
 
-Engine::Engine()
-    : frameCount(0)
-{
-    // Initialization logic can go here
-}
+Engine::Engine() {};
 
 Engine::~Engine()
 {
@@ -27,18 +23,18 @@ void Engine::Run()
 {
     bool quit = false;
     const int targetFPS = -1;
-    const std::chrono::milliseconds frameDuration(1000 / targetFPS);
+    const std::chrono::milliseconds targetFrameTime = std::chrono::milliseconds(1000 / targetFPS);
 
     lastFrameTime = std::chrono::high_resolution_clock::now();
-    lastDebugTime = std::chrono::high_resolution_clock::now();
 
     while (!quit)
     {
-        context->inputManager->PollEvents();
+#if defined(_NSHIPPING) 
+        PROFILE_SCOPE_RATE("FRAME", 1000); 
+#endif
 
-        auto currentTime = std::chrono::high_resolution_clock::now();
-        auto deltaTime = std::chrono::duration_cast<std::chrono::microseconds>(currentTime - lastFrameTime).count();
-        auto debugElapsed = std::chrono::duration_cast<std::chrono::microseconds>(currentTime - lastDebugTime);
+        auto frameStart = std::chrono::high_resolution_clock::now();
+        context->inputManager->PollEvents();
 
         if (context->inputManager->IsQuitRequested() || context->inputManager->IsPressed_Escape()) {
             quit = true;
@@ -49,28 +45,14 @@ void Engine::Run()
         if (context->inputManager->IsPressed_2()) context->debugFlags[2] = !context->debugFlags[2];
         if (context->inputManager->IsPressed_3()) context->debugFlags[3] = !context->debugFlags[3];
 
+        double deltaTime = (frameStart - lastFrameTime).count();
+        Tick(deltaTime);
 
-        if (deltaTime >= frameDuration.count())
-        {
-            lastFrameTime = currentTime;
+        auto frameEnd = std::chrono::high_resolution_clock::now();
+        auto frameDuration = std::chrono::duration_cast<std::chrono::milliseconds>(frameEnd - frameStart);
 
-            frameCount++;
-
-            if (debugElapsed.count() > 250000) {
-                lastDebugTime = currentTime;
-
-                // Calculate frames per second
-                float fps = static_cast<float>(frameCount) * 1000000 / debugElapsed.count();
-                sprintf_s(context->fpsTextBuffer, "%.1f fps", fps);
-
-                // Display elapsed milliseconds
-                float elapsedMicroseconds = (float)debugElapsed.count() / 1000 / frameCount;
-                sprintf_s(context->msTextBuffer, "%.3f ms", elapsedMicroseconds);
-
-                frameCount = 0;  // Reset frame count
-            }
-
-            Tick(deltaTime);
+        if (frameDuration < targetFrameTime) {
+            std::this_thread::sleep_for(targetFrameTime - frameDuration);
         }
     }
 }
@@ -84,22 +66,11 @@ void Engine::Tick(double deltaTime)
 {
     context->gameLogic->Tick(deltaTime);
     context->physics->Tick(deltaTime);
+    context->debug->Tick();
     Render();
 }
 
 void Engine::Render()
 {
-    RenderGame();
-    //RenderUI();
-    RenderDebug();
-}
-
-void Engine::RenderGame()
-{
     context->gameRenderer->Render();
-}
-
-void Engine::RenderDebug()
-{
-    // Debug rendering logic
 }

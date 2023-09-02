@@ -39,4 +39,7 @@ public:
     void RenderGame();
     void RenderDebug();
     void Render();
+
+    void DrawRectangle(float x, float y, float w, float h, ARGB& color, bool upscale);
+    void DrawFilledRectangle(float x, float y, float w, float h, ARGB& color, bool upscale);
 };

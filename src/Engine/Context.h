@@ -9,6 +9,7 @@
 #include "Renderer/TextRenderer.h"
 #include "GameLogic/GameLogic.h"
 #include "Physics/Physics.h"
+#include "Debug/Debug.h"
 
 class InputManager;
 class ResourceManager;
@@ -17,6 +18,7 @@ class GameLogic;
 class Physics;
 class Renderer;
 class TextRenderer;
+class Debug;
 
 class Context {
 public:
@@ -50,6 +52,7 @@ public:
     ResourceManager* resourceManager;
     Renderer* gameRenderer;
     TextRenderer* textRenderer;
+    Debug* debug;
 
     Context();
     ~Context();

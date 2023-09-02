@@ -26,6 +26,7 @@ void Context::Init() {
     physics = new Physics(this);
     gameRenderer = new Renderer(this);
     textRenderer = new TextRenderer(this);
+    debug = new Debug(this);
 }
 
 void Context::ApplyResolution() {
@@ -43,6 +44,7 @@ void Context::Destroy() {
     delete resourceManager;
     delete gameRenderer;
     delete textRenderer;
+    delete debug;
 
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);

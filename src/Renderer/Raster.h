@@ -13,9 +13,10 @@ public:
 	int width;
 	int height;
 	int size;
-	std::vector<Pixel> pixels;
+	Pixel* pixels;
 
 	Raster(int width, int height);
+	~Raster();
 
 	Pixel& GetPixel(const int index);
 	Pixel& GetPixel(coord c);

@@ -56,14 +56,40 @@ void Renderer::RenderGame() {
     SDL_RenderTexture(context->renderer, buffer, &textureSrcRect, &textureDstRect);
 }
 
-void Renderer::RenderDebug() {
-    if (context->debugFlags[1]) context->textRenderer->Render(context->fpsTextBuffer, Point{ context->RESOLUTION_WIDTH - 20,20 }, SDL_Color{ 0,255,0,255 }, 12, TextAlignment::Right);
-    if (context->debugFlags[2]) context->textRenderer->Render(context->msTextBuffer, Point{ context->RESOLUTION_WIDTH - 32,34 }, SDL_Color{ 0,255,0,255 }, 12, TextAlignment::Right);
-    if (context->debugFlags[3]) DrawDebug();
-}
-
 void Renderer::Render() {
     RenderGame();
-    RenderDebug();
+
+#if defined(_NSHIPPING)
+    context->debug->Render();
+#endif
+
     SDL_RenderPresent(context->renderer);
+}
+
+void Renderer::DrawRectangle(float x, float y, float w, float h, ARGB& color, bool upscale) {
+    SDL_FRect rect = SDL_FRect{ x,y,w,h };
+    if (upscale) {
+        rect.x = x * context->RESOLUTION_MULTIPLIER;
+        rect.y = y * context->RESOLUTION_MULTIPLIER;
+        rect.y = y * context->RESOLUTION_MULTIPLIER;
+        rect.w = w * context->RESOLUTION_MULTIPLIER;
+        rect.h = h * context->RESOLUTION_MULTIPLIER;
+    }
+    SDL_SetRenderDrawBlendMode(context->renderer, SDL_BLENDMODE_BLEND);
+    SDL_SetRenderDrawColor(context->renderer, color.R, color.G, color.B, color.A);
+    SDL_RenderRect(context->renderer, &rect);
+}
+
+void Renderer::DrawFilledRectangle(float x, float y, float w, float h, ARGB& color, bool upscale) {
+    SDL_FRect rect = SDL_FRect{ x,y,w,h };
+    if (upscale) {
+        rect.x = x * context->RESOLUTION_MULTIPLIER;
+        rect.y = y * context->RESOLUTION_MULTIPLIER;
+        rect.y = y * context->RESOLUTION_MULTIPLIER;
+        rect.w = w * context->RESOLUTION_MULTIPLIER;
+        rect.h = h * context->RESOLUTION_MULTIPLIER;
+    }
+    SDL_SetRenderDrawBlendMode(context->renderer, SDL_BLENDMODE_BLEND);
+    SDL_SetRenderDrawColor(context->renderer, color.R, color.G, color.B, color.A);
+    SDL_RenderFillRect(context->renderer, &rect);
 }
