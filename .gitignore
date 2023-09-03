@@ -398,3 +398,5 @@ FodyWeavers.xsd
 *.sln.iml
 
 .vendor/
+!.src/Debug/Debug.h
+!.src/Debug/Debug.cpp
