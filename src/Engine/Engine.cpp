@@ -14,8 +14,6 @@ void Engine::Initialize()
     context = new Context();
     context->Init();
 
-    context->textRenderer->LoadFontTexture("T_Font_ascii", "assets/textures/ascii.png", 16);
-
     context->gameLogic->InitGame();
 }
 

@@ -12,10 +12,23 @@ Renderer::Renderer(Context* context) : context(context) {
 
     white = { 255,255,255,255 };
     black = { 255,0,0,0 };
+
+    textRenderer = new TextRenderer(context);
+    textRenderer->LoadFontTexture("T_Font_ascii", "assets/textures/ascii.png", 16);
 }
 
 Renderer::~Renderer() {
+    delete textRenderer;
     SDL_DestroyTexture(buffer);
+}
+
+void Renderer::DrawText(const char* text,
+    const Point& location,
+    const SDL_Color color = SDL_Color{ 255,255,255,255 },
+    int fontSize = 12,
+    TextAlignment alignment = TextAlignment::Left) 
+{
+    textRenderer->Render(text, location, color, fontSize, alignment);
 }
 
 void Renderer::DrawPixels() {

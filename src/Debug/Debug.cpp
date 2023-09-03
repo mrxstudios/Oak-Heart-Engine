@@ -9,8 +9,8 @@ void Debug::Tick() {
 }
 
 void Debug::Render() {
-	if (context->debugFlags[1]) context->textRenderer->Render(context->fpsTextBuffer, Point{ context->RESOLUTION_WIDTH - 20,20 }, SDL_Color{ 0,255,0,255 }, 12, TextAlignment::Right);
-	if (context->debugFlags[2]) context->textRenderer->Render(context->msTextBuffer, Point{ context->RESOLUTION_WIDTH - 32,34 }, SDL_Color{ 0,255,0,255 }, 12, TextAlignment::Right);
+	if (context->debugFlags[1]) context->gameRenderer->DrawText(context->fpsTextBuffer, Point{ context->RESOLUTION_WIDTH - 20,20 }, SDL_Color{ 0,255,0,255 }, 12, TextAlignment::Right);
+	if (context->debugFlags[2]) context->gameRenderer->DrawText(context->msTextBuffer, Point{ context->RESOLUTION_WIDTH - 32,34 }, SDL_Color{ 0,255,0,255 }, 12, TextAlignment::Right);
 	if (context->debugFlags[3]) RenderTiles();
 }
 

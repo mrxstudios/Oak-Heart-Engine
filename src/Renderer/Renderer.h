@@ -19,6 +19,7 @@ struct ARGB {
 class Renderer {
 private:
     Context* context;
+    TextRenderer* textRenderer;
 
     // Colors
     ARGB black;
@@ -42,4 +43,9 @@ public:
 
     void DrawRectangle(float x, float y, float w, float h, ARGB& color, bool upscale);
     void DrawFilledRectangle(float x, float y, float w, float h, ARGB& color, bool upscale);
+    void DrawText(const char* text,
+        const Point& location,
+        const SDL_Color color = SDL_Color{ 255,255,255,255 },
+        int fontSize = 12,
+        TextAlignment alignment = TextAlignment::Left);
 };

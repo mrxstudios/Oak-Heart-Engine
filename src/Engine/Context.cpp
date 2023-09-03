@@ -25,7 +25,6 @@ void Context::Init() {
     gameLogic = new GameLogic(this);
     physics = new Physics(this);
     gameRenderer = new Renderer(this);
-    textRenderer = new TextRenderer(this);
     debug = new Debug(this);
 }
 
@@ -43,7 +42,6 @@ void Context::Destroy() {
     delete physics;
     delete resourceManager;
     delete gameRenderer;
-    delete textRenderer;
     delete debug;
 
     SDL_DestroyRenderer(renderer);
