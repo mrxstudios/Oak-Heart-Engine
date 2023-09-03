@@ -28,7 +28,7 @@ void GameLogic::InitGame() {
             if (distance <= radius) {
                 if (std::rand() % 5 == 0) {
                     coord c = coord{ x,y };
-                    raster.GetPixel(c).SetValue(7);
+                    raster.GetPixel(c).SetValue(11);
                 }
             }
         }
@@ -38,7 +38,7 @@ void GameLogic::InitGame() {
         for (int x = 0; x < sdl_data.VIEW_WIDTH; ++x) {
             if (x % 10 > 5) {
                 coord c = coord{ x,y };
-                raster.GetPixel(c).SetValue(7);
+                raster.GetPixel(c).SetValue(11);
             }
         }
     }*/
@@ -58,7 +58,7 @@ void GameLogic::SpawnRectangleOfSand() {
                 unsigned char noise = std::rand() % 50;
                 if (std::rand() % 5 == 0) {
                     coord c = coord{ x,y };
-                    context->raster->GetPixel(c).SetValue(7);
+                    context->raster->GetPixel(c).SetValue(11);
                     context->raster->GetPixel(c).SetExists(true);
                 }
             }

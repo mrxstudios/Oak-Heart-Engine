@@ -2,7 +2,7 @@
 
 Renderer::Renderer(Context* context) : context(context) {
 	textureSrcRect = SDL_FRect{ 0,0,(float)context->VIEW_WIDTH,(float)context->VIEW_HEIGHT };
-	textureDstRect = SDL_FRect{ 0,0,(float)context->RESOLUTION_WIDTH,(float)context->RESOLUTION_HEIGHT };
+	textureDstRect = SDL_FRect{ (float)context->CANVAS_OFFSET_X,(float)context->CANVAS_OFFSET_Y,(float)context->CANVAS_WIDTH,(float)context->CANVAS_HEIGHT };
 
     buffer = SDL_CreateTexture(context->renderer,
         SDL_PIXELFORMAT_BGRA8888,
@@ -58,18 +58,13 @@ void Renderer::DrawPixels() {
 }
 
 
-void Renderer::DrawDebug() {
-    SDL_FRect rect = SDL_FRect{ 100,100,100,100 };
-    SDL_SetRenderDrawColor(context->renderer, 0, 255, 0, 0);
-    SDL_RenderRect(context->renderer, &rect);
-}
-
 void Renderer::RenderGame() {
     DrawPixels();
     SDL_RenderTexture(context->renderer, buffer, &textureSrcRect, &textureDstRect);
 }
 
 void Renderer::Render() {
+    //SDL_RenderClear(context->renderer);
     RenderGame();
 
 #if defined(_NSHIPPING)
@@ -82,11 +77,11 @@ void Renderer::Render() {
 void Renderer::DrawRectangle(float x, float y, float w, float h, ARGB& color, bool upscale) {
     SDL_FRect rect = SDL_FRect{ x,y,w,h };
     if (upscale) {
-        rect.x = x * context->RESOLUTION_MULTIPLIER;
-        rect.y = y * context->RESOLUTION_MULTIPLIER;
-        rect.y = y * context->RESOLUTION_MULTIPLIER;
-        rect.w = w * context->RESOLUTION_MULTIPLIER;
-        rect.h = h * context->RESOLUTION_MULTIPLIER;
+        rect.x = x * context->CANVAS_MULTIPLIER;
+        rect.y = y * context->CANVAS_MULTIPLIER;
+        rect.y = y * context->CANVAS_MULTIPLIER;
+        rect.w = w * context->CANVAS_MULTIPLIER;
+        rect.h = h * context->CANVAS_MULTIPLIER;
     }
     SDL_SetRenderDrawBlendMode(context->renderer, SDL_BLENDMODE_BLEND);
     SDL_SetRenderDrawColor(context->renderer, color.R, color.G, color.B, color.A);
@@ -96,11 +91,11 @@ void Renderer::DrawRectangle(float x, float y, float w, float h, ARGB& color, bo
 void Renderer::DrawFilledRectangle(float x, float y, float w, float h, ARGB& color, bool upscale) {
     SDL_FRect rect = SDL_FRect{ x,y,w,h };
     if (upscale) {
-        rect.x = x * context->RESOLUTION_MULTIPLIER;
-        rect.y = y * context->RESOLUTION_MULTIPLIER;
-        rect.y = y * context->RESOLUTION_MULTIPLIER;
-        rect.w = w * context->RESOLUTION_MULTIPLIER;
-        rect.h = h * context->RESOLUTION_MULTIPLIER;
+        rect.x = x * context->CANVAS_MULTIPLIER;
+        rect.y = y * context->CANVAS_MULTIPLIER;
+        rect.y = y * context->CANVAS_MULTIPLIER;
+        rect.w = w * context->CANVAS_MULTIPLIER;
+        rect.h = h * context->CANVAS_MULTIPLIER;
     }
     SDL_SetRenderDrawBlendMode(context->renderer, SDL_BLENDMODE_BLEND);
     SDL_SetRenderDrawColor(context->renderer, color.R, color.G, color.B, color.A);

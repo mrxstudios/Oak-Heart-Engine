@@ -36,9 +36,7 @@ public:
     ~Renderer();
 
     void DrawPixels();
-    void DrawDebug();
     void RenderGame();
-    void RenderDebug();
     void Render();
 
     void DrawRectangle(float x, float y, float w, float h, ARGB& color, bool upscale);

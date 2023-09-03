@@ -1,4 +1,5 @@
 #include "Context.h"
+#include "Utility/Math.h"
 
 Context::Context() {
     // Initialize the fields here, if necessary
@@ -29,9 +30,15 @@ void Context::Init() {
 }
 
 void Context::ApplyResolution() {
-    RESOLUTION_MULTIPLIER = 4;
-    VIEW_WIDTH = RESOLUTION_WIDTH / RESOLUTION_MULTIPLIER;
-    VIEW_HEIGHT = RESOLUTION_HEIGHT / RESOLUTION_MULTIPLIER;
+    CANVAS_WIDTH = Math::nearestPowerOfTwo(RESOLUTION_WIDTH);
+    CANVAS_HEIGHT = Math::nearestPowerOfTwo(RESOLUTION_HEIGHT);
+    CANVAS_OFFSET_X = (RESOLUTION_WIDTH - CANVAS_WIDTH) / 2;
+    CANVAS_OFFSET_Y = (RESOLUTION_HEIGHT - CANVAS_HEIGHT) / 2;
+
+    CANVAS_MULTIPLIER = 4;
+
+    VIEW_WIDTH = CANVAS_WIDTH / CANVAS_MULTIPLIER;
+    VIEW_HEIGHT = CANVAS_HEIGHT / CANVAS_MULTIPLIER;
     TOTAL_PIXELS = VIEW_WIDTH * VIEW_HEIGHT;
 }
 

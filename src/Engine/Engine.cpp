@@ -45,7 +45,7 @@ void Engine::Run()
 
         if (context->inputManager->IsDown_LeftMouse()) {
             SDL_Point mouseLocation = context->inputManager->GetMousePosition();
-            context->raster->GetPixel(coord{ mouseLocation.x / context->RESOLUTION_MULTIPLIER,mouseLocation.y / context->RESOLUTION_MULTIPLIER }).SetValue(7);
+            context->raster->GetPixel(coord{ (mouseLocation.x-context->CANVAS_OFFSET_X) / context->CANVAS_MULTIPLIER,(mouseLocation.y - context->CANVAS_OFFSET_Y) / context->CANVAS_MULTIPLIER }).SetValue(11);
         }
 
         double deltaTime = (frameStart - lastFrameTime).count();

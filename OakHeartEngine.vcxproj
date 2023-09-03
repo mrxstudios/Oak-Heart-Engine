@@ -199,6 +199,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Utility\Math.cpp" />
     <ClCompile Include="src\Physics\Physics.cpp" />
     <ClCompile Include="src\Engine\Context.cpp" />
     <ClCompile Include="src\Debug\Debug.cpp" />
@@ -220,6 +221,7 @@
     <Library Include="SDL3_image.lib" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Utility\Math.h" />
     <ClInclude Include="src\Engine\Types.h" />
     <ClInclude Include="src\Physics\Physics.h" />
     <ClInclude Include="src\Engine\Context.h" />

@@ -27,11 +27,17 @@ public:
     int RESOLUTION_WIDTH = 800;
     int RESOLUTION_HEIGHT = 600;
 
+    // Canvas resolution
+    int CANVAS_WIDTH = 800;
+    int CANVAS_HEIGHT = 600;
+    int CANVAS_OFFSET_X = 0;
+    int CANVAS_OFFSET_Y = 0;
+
     // View dimensions
     int VIEW_WIDTH = 200;
     int VIEW_HEIGHT = 150;
 
-    int RESOLUTION_MULTIPLIER = 4;
+    int CANVAS_MULTIPLIER = 4;
     int TOTAL_PIXELS = 30000;
 
     // Window
