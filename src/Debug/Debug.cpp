@@ -1,6 +1,7 @@
 #include "Debug.h"
 
 Debug::Debug(Context* context) : context(context) {
+	frameElapsed = 0;
 	profiler = &Profiler::GetInstance();
 };
 

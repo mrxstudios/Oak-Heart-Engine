@@ -138,6 +138,9 @@
     <ClInclude Include="src\Physics\Tile.h">
       <Filter>Source Files\Physics</Filter>
     </ClInclude>
+    <ClInclude Include="src\Engine\Types.h">
+      <Filter>Source Files\Engine</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="src\Input\EventsOverview.txt" />

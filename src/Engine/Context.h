@@ -2,6 +2,7 @@
 
 #include <SDL3/SDL.h>
 
+#include "Engine/Types.h"
 #include "Input/InputManager.h"
 #include "Engine/ResourceManager.h"
 #include "Renderer/Raster.h"

@@ -43,6 +43,11 @@ void Engine::Run()
         if (context->inputManager->IsPressed_2()) context->debugFlags[2] = !context->debugFlags[2];
         if (context->inputManager->IsPressed_3()) context->debugFlags[3] = !context->debugFlags[3];
 
+        if (context->inputManager->IsDown_LeftMouse()) {
+            SDL_Point mouseLocation = context->inputManager->GetMousePosition();
+            context->raster->GetPixel(coord{ mouseLocation.x / context->RESOLUTION_MULTIPLIER,mouseLocation.y / context->RESOLUTION_MULTIPLIER }).SetValue(7);
+        }
+
         double deltaTime = (frameStart - lastFrameTime).count();
         Tick(deltaTime);
 

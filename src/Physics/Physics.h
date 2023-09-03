@@ -32,6 +32,11 @@ public:
 private:
 	inline bool ParseSand(size_t index);
 	inline void SwapPixels(Pixel& a, Pixel& b);
+	inline bool AtBounds(size_t index);
+	inline bool AtLeftBound(size_t index);
+	inline bool AtRightBound(size_t index);
+	inline bool AtTopBound(size_t index);
+	inline bool AtBottomBound(size_t index);
 	
 	void SetupTiles();
 	void CleanTiles();

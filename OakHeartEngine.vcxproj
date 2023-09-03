@@ -220,6 +220,7 @@
     <Library Include="SDL3_image.lib" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Engine\Types.h" />
     <ClInclude Include="src\Physics\Physics.h" />
     <ClInclude Include="src\Engine\Context.h" />
     <ClInclude Include="src\Debug\Debug.h" />

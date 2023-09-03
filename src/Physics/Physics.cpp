@@ -37,7 +37,7 @@ inline bool Physics::ParseSand(size_t index) {
     Pixel& pixel = context->raster->GetPixel(index);
     if (!pixel.Exists()) return false;
     if (pixel.IsDynamic() && pixel.IsAwake()) {
-        if (index < context->TOTAL_PIXELS - 1 - context->VIEW_WIDTH) {
+        if (!AtBottomBound(index)) {
             Pixel& pixel_below = context->raster->GetPixel(index + context->VIEW_WIDTH);
             if (!pixel_below.Exists()) {
                 MarkTileDirty(index);
@@ -51,7 +51,7 @@ inline bool Physics::ParseSand(size_t index) {
                     pixel.SetAwake(false);
                 }
                 else {
-                    if (!pixel_bottom_left.Exists() && !pixel_bottom_right.Exists()) {
+                    if (!pixel_bottom_left.Exists() && !pixel_bottom_right.Exists() && !AtLeftBound(index) && !AtRightBound(index)) {
                         if (std::rand() % 2 == 0) {
                             MarkTileDirty(index);
                             MarkTileDirty(index + context->VIEW_WIDTH - 1);
@@ -64,15 +64,18 @@ inline bool Physics::ParseSand(size_t index) {
                         }
                     }
                     else {
-                        if (!pixel_bottom_left.Exists()) {
+                        if (!pixel_bottom_left.Exists() && !AtLeftBound(index)) {
                             MarkTileDirty(index);
                             MarkTileDirty(index + context->VIEW_WIDTH - 1);
                             SwapPixels(pixel, pixel_bottom_left);
                         }
-                        else if (!pixel_bottom_right.Exists()) {
+                        else if (!pixel_bottom_right.Exists() && !AtRightBound(index)) {
                             MarkTileDirty(index);
                             MarkTileDirty(index + context->VIEW_WIDTH + 1);
                             SwapPixels(pixel, pixel_bottom_right);
+                        }
+                        else {
+                            pixel.SetAwake(false);
                         }
                     }
                 }
@@ -89,6 +92,26 @@ void Physics::SwapPixels(Pixel& a, Pixel& b) {
     swapPixel = a;
     a = b;
     b = swapPixel;
+}
+
+bool Physics::AtBounds(size_t index) {
+    return  AtLeftBound(index) || AtRightBound(index) || AtTopBound(index) || AtBottomBound(index);
+}
+
+bool Physics::AtLeftBound(size_t index) {
+    return (index % context->VIEW_WIDTH) == 0;
+}
+
+bool Physics::AtRightBound(size_t index) {
+    return (index % (context->VIEW_WIDTH)) == context->VIEW_WIDTH - 1;
+}
+
+bool Physics::AtTopBound(size_t index) {
+    return (index < context->VIEW_WIDTH);
+}
+
+bool Physics::AtBottomBound(size_t index) {
+    return (index >= (context->TOTAL_PIXELS - context->VIEW_WIDTH));
 }
 
 int Physics::GetTileIndex(int pixelIndex) {

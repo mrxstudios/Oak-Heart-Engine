@@ -24,9 +24,9 @@ Renderer::~Renderer() {
 
 void Renderer::DrawText(const char* text,
     const Point& location,
-    const SDL_Color color = SDL_Color{ 255,255,255,255 },
-    int fontSize = 12,
-    TextAlignment alignment = TextAlignment::Left) 
+    const SDL_Color color,
+    int fontSize,
+    TextAlignment alignment) 
 {
     textRenderer->Render(text, location, color, fontSize, alignment);
 }

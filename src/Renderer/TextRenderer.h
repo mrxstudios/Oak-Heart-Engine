@@ -8,17 +8,6 @@
 class Context;
 class ResourceManager;
 
-struct Point {
-	int x;
-	int y;
-};
-
-enum TextAlignment {
-	Left,
-	Center,
-	Right
-};
-
 class TextRenderer {
 
 private:
