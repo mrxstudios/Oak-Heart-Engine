@@ -3,18 +3,13 @@
 #include "Engine/Context.h" // Assuming OHE_Context is defined in its own header
 #include "Engine/ResourceManager.h" // Assuming ResourceManager is defined in its own header
 #include "TextRenderer.h" // Assuming TextRenderer is defined in its own header
+#include "Palette.h"
+
 #include <SDL3/SDL.h>
 
 class Context;
 class ResourceManager;
 class TextRenderer;
-
-struct ARGB {
-    uint_fast8_t A;
-    uint_fast8_t R;
-    uint_fast8_t G;
-    uint_fast8_t B;
-};
 
 class Renderer {
 private:

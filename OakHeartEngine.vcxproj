@@ -221,6 +221,7 @@
     <Library Include="SDL3_image.lib" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Renderer\Palette.h" />
     <ClInclude Include="src\Utility\Math.h" />
     <ClInclude Include="src\Engine\Types.h" />
     <ClInclude Include="src\Physics\Physics.h" />

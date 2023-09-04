@@ -1,6 +1,6 @@
 #include "Raster.h"
 
-Raster::Raster(int width, int height) : width(width), height(height), size(width*height){
+Raster::Raster(Context* context, int width, int height) : context(context), width(width), height(height), size(width*height){
 	pixels = new Pixel[size];
 
 	/*for (size_t i = 0; i < size; i++) {
@@ -31,6 +31,18 @@ coord Raster::IndexToCoord(int index) {
 	};
 };
 
+void Raster::SetSquareToValue(coord c, int value, int color, unsigned int size=1)
+{
+	size -= 1;
+
+	for (int y = c.y - size; y <= c.y + size; y++) {
+		for (int x = c.x - size; x <= c.x + size; x++) {
+			Pixel& pixel = pixels[y * context->VIEW_WIDTH + x];
+			pixel.SetValue(value);
+			pixel.SetColor(color);
+		}
+	}
+}
 int Raster::CoordToIndex(coord c) {
 	return (width*c.y) + c.x;
 }

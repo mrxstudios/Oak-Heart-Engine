@@ -21,7 +21,8 @@ void Context::Init() {
     ApplyResolution();
 
     inputManager = new InputManager();
-    raster = new Raster(VIEW_WIDTH, VIEW_HEIGHT);
+    palette = new Palette();
+    raster = new Raster(this, VIEW_WIDTH, VIEW_HEIGHT);
     resourceManager = new ResourceManager(this);
     gameLogic = new GameLogic(this);
     physics = new Physics(this);
@@ -30,8 +31,10 @@ void Context::Init() {
 }
 
 void Context::ApplyResolution() {
-    CANVAS_WIDTH = Math::nearestPowerOfTwo(RESOLUTION_WIDTH);
-    CANVAS_HEIGHT = Math::nearestPowerOfTwo(RESOLUTION_HEIGHT);
+    CANVAS_WIDTH = RESOLUTION_WIDTH;
+    CANVAS_HEIGHT = RESOLUTION_HEIGHT;
+    //CANVAS_WIDTH = Math::nearestPowerOfTwo(RESOLUTION_WIDTH);
+    //CANVAS_HEIGHT = Math::nearestPowerOfTwo(RESOLUTION_HEIGHT);
     CANVAS_OFFSET_X = (RESOLUTION_WIDTH - CANVAS_WIDTH) / 2;
     CANVAS_OFFSET_Y = (RESOLUTION_HEIGHT - CANVAS_HEIGHT) / 2;
 
@@ -44,6 +47,7 @@ void Context::ApplyResolution() {
 
 void Context::Destroy() {
     delete inputManager;
+    delete palette;
     delete gameLogic;
     delete raster;
     delete physics;

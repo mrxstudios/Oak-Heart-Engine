@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include "Engine/Context.h"
 #include "Pixel.h"
 
 struct coord {
@@ -8,14 +9,18 @@ struct coord {
 	int y;
 };
 
+class Context;
+
 class Raster {
+private:
+	Context* context;
 public:
 	int width;
 	int height;
 	int size;
 	Pixel* pixels;
 
-	Raster(int width, int height);
+	Raster(Context* context, int width, int height);
 	~Raster();
 
 	Pixel& GetPixel(const int index);
@@ -24,4 +29,6 @@ public:
 
 	inline coord IndexToCoord(int index);
 	inline int CoordToIndex(coord c);
+	
+	void SetSquareToValue(coord c, int value, int color, unsigned int size);
 };

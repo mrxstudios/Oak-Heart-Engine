@@ -40,12 +40,13 @@ void Renderer::DrawPixels() {
     ARGB* ARGBptr = reinterpret_cast<ARGB*>(pixels);
     for (size_t i = 0; i < context->TOTAL_PIXELS; i++) {
         Pixel& pixel = context->raster->GetPixel(i);
-        if (pixel.Exists()) {
-            if (pixel.IsAwake()) {
-                *ARGBptr = white;
+        ARGB color = context->palette->clut[pixel.GetColor()];
+        if (pixel.CheckState(PIXEL_EXISTS)) {
+            if (pixel.CheckState(PIXEL_AWAKE)) {
+                *ARGBptr = color;
             }
             else {
-                *ARGBptr = ARGB{ 255,255,0,0 };
+                *ARGBptr = color;
             }
         }
         else {
@@ -60,7 +61,8 @@ void Renderer::DrawPixels() {
 
 void Renderer::RenderGame() {
     DrawPixels();
-    SDL_RenderTexture(context->renderer, buffer, &textureSrcRect, &textureDstRect);
+    //SDL_RenderTexture(context->renderer, buffer, &textureSrcRect, &textureDstRect);
+    SDL_RenderTexture(context->renderer, buffer, &textureSrcRect, NULL);
 }
 
 void Renderer::Render() {

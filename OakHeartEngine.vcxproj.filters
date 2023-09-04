@@ -147,6 +147,9 @@
     <ClInclude Include="src\Utility\Math.h">
       <Filter>Source Files\Utility</Filter>
     </ClInclude>
+    <ClInclude Include="src\Renderer\Palette.h">
+      <Filter>Source Files\Renderer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="src\Input\EventsOverview.txt" />

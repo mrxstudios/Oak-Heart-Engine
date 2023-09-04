@@ -5,6 +5,7 @@
 #include "Engine/Types.h"
 #include "Input/InputManager.h"
 #include "Engine/ResourceManager.h"
+#include "Renderer/Palette.h"
 #include "Renderer/Raster.h"
 #include "Renderer/Renderer.h"
 #include "Renderer/TextRenderer.h"
@@ -12,7 +13,9 @@
 #include "Physics/Physics.h"
 #include "Debug/Debug.h"
 
+
 class InputManager;
+class Palette;
 class ResourceManager;
 class Raster;
 class GameLogic;
@@ -55,6 +58,7 @@ public:
     InputManager* inputManager;
     GameLogic* gameLogic;
     Physics* physics;
+    Palette* palette;
     Raster* raster;
     ResourceManager* resourceManager;
     Renderer* gameRenderer;

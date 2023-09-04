@@ -35,11 +35,10 @@ void Physics::CleanTiles() {
 
 inline bool Physics::ParseSand(size_t index) {
     Pixel& pixel = context->raster->GetPixel(index);
-    if (!pixel.Exists()) return false;
-    if (pixel.IsDynamic() && pixel.IsAwake()) {
+    if (pixel.CheckState(PIXEL_EXISTS_DYNAMIC)) {
         if (!AtBottomBound(index)) {
             Pixel& pixel_below = context->raster->GetPixel(index + context->VIEW_WIDTH);
-            if (!pixel_below.Exists()) {
+            if (!pixel_below.CheckState(PIXEL_EXISTS)) {
                 MarkTileDirty(index);
                 MarkTileDirty(index + context->VIEW_WIDTH);
                 SwapPixels(pixel, pixel_below);
@@ -47,11 +46,11 @@ inline bool Physics::ParseSand(size_t index) {
             else {
                 Pixel& pixel_bottom_left = context->raster->GetPixel(index + context->VIEW_WIDTH - 1);
                 Pixel& pixel_bottom_right = context->raster->GetPixel(index + context->VIEW_WIDTH + 1);
-                if (pixel_bottom_left.Exists() && pixel_bottom_right.Exists()) {
+                if (pixel_bottom_left.CheckState(PIXEL_EXISTS) && pixel_bottom_right.CheckState(PIXEL_EXISTS)) {
                     pixel.SetAwake(false);
                 }
                 else {
-                    if (!pixel_bottom_left.Exists() && !pixel_bottom_right.Exists() && !AtLeftBound(index) && !AtRightBound(index)) {
+                    if (!pixel_bottom_left.CheckState(PIXEL_EXISTS) && !pixel_bottom_right.CheckState(PIXEL_EXISTS) && !AtLeftBound(index) && !AtRightBound(index)) {
                         if (std::rand() % 2 == 0) {
                             MarkTileDirty(index);
                             MarkTileDirty(index + context->VIEW_WIDTH - 1);
@@ -64,12 +63,12 @@ inline bool Physics::ParseSand(size_t index) {
                         }
                     }
                     else {
-                        if (!pixel_bottom_left.Exists() && !AtLeftBound(index)) {
+                        if (!pixel_bottom_left.CheckState(PIXEL_EXISTS) && !AtLeftBound(index)) {
                             MarkTileDirty(index);
                             MarkTileDirty(index + context->VIEW_WIDTH - 1);
                             SwapPixels(pixel, pixel_bottom_left);
                         }
-                        else if (!pixel_bottom_right.Exists() && !AtRightBound(index)) {
+                        else if (!pixel_bottom_right.CheckState(PIXEL_EXISTS) && !AtRightBound(index)) {
                             MarkTileDirty(index);
                             MarkTileDirty(index + context->VIEW_WIDTH + 1);
                             SwapPixels(pixel, pixel_bottom_right);

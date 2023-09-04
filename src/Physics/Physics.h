@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Engine/Context.h"
+#include "Renderer/Pixel.h"
 #include "Physics/Tile.h"
 #include "Debug/Debug.h"
 
