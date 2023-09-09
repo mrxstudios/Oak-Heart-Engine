@@ -1,124 +1,118 @@
 #include "Physics.h"
 
 Physics::Physics(Context* context) : context(context) {
-    SetupTiles();
+    //SetupTiles();
 };
 
 void Physics::Tick(double deltaTime) {
-    CleanTiles();
-    for (size_t i = context->TOTAL_PIXELS - 1; i != SIZE_MAX; i--) {
-    //for (size_t i = 0; i < context->TOTAL_PIXELS; i++) {
-        ParseSand(i);
-    }
-}
+    Raster& raster = *context->raster;
+    raster.ResetPixelUpdatedState();
 
-void Physics::SetupTiles() {
-    int desiredTileSize = 40;
-    
-
-    int horizontalDivider = 
-    tileColumns = context->VIEW_WIDTH / desiredTileSize;
-    tileRows = context->VIEW_HEIGHT / desiredTileSize;
-
-    tileWidth = context->VIEW_WIDTH / tileColumns;
-    tileHeight = context->VIEW_HEIGHT / tileRows;
-    tileCount = tileColumns * tileRows;
-
-    tiles = new Tile[tileCount];
-}
-
-void Physics::CleanTiles() {
-    for (size_t i = 0; i < tileCount; i++) {
-        tiles[i].MarkClean();
-    }
-}
-
-inline bool Physics::ParseSand(size_t index) {
-    Pixel& pixel = context->raster->GetPixel(index);
-    if (pixel.CheckState(PIXEL_EXISTS_DYNAMIC)) {
-        if (!AtBottomBound(index)) {
-            Pixel& pixel_below = context->raster->GetPixel(index + context->VIEW_WIDTH);
-            if (!pixel_below.CheckState(PIXEL_EXISTS)) {
-                MarkTileDirty(index);
-                MarkTileDirty(index + context->VIEW_WIDTH);
-                SwapPixels(pixel, pixel_below);
-            }
-            else {
-                Pixel& pixel_bottom_left = context->raster->GetPixel(index + context->VIEW_WIDTH - 1);
-                Pixel& pixel_bottom_right = context->raster->GetPixel(index + context->VIEW_WIDTH + 1);
-                if (pixel_bottom_left.CheckState(PIXEL_EXISTS) && pixel_bottom_right.CheckState(PIXEL_EXISTS)) {
-                    pixel.SetAwake(false);
-                }
-                else {
-                    if (!pixel_bottom_left.CheckState(PIXEL_EXISTS) && !pixel_bottom_right.CheckState(PIXEL_EXISTS) && !AtLeftBound(index) && !AtRightBound(index)) {
-                        if (std::rand() % 2 == 0) {
-                            MarkTileDirty(index);
-                            MarkTileDirty(index + context->VIEW_WIDTH - 1);
-                            SwapPixels(pixel, pixel_bottom_left);
-                        }
-                        else {
-                            MarkTileDirty(index);
-                            MarkTileDirty(index + context->VIEW_WIDTH + 1);
-                            SwapPixels(pixel, pixel_bottom_right);
-                        }
-                    }
-                    else {
-                        if (!pixel_bottom_left.CheckState(PIXEL_EXISTS) && !AtLeftBound(index)) {
-                            MarkTileDirty(index);
-                            MarkTileDirty(index + context->VIEW_WIDTH - 1);
-                            SwapPixels(pixel, pixel_bottom_left);
-                        }
-                        else if (!pixel_bottom_right.CheckState(PIXEL_EXISTS) && !AtRightBound(index)) {
-                            MarkTileDirty(index);
-                            MarkTileDirty(index + context->VIEW_WIDTH + 1);
-                            SwapPixels(pixel, pixel_bottom_right);
-                        }
-                        else {
-                            pixel.SetAwake(false);
-                        }
-                    }
+    for (size_t i = 0; i < raster.tileCount; i++) {
+        Tile& tile = raster.GetTile(i);
+        if (tile.awakePixels > 0) {
+            for (size_t x = tile.tileBounds.x1; x < tile.tileBounds.x2; x++) {
+                for (size_t y = tile.tileBounds.y1; y < tile.tileBounds.y2; y++) {
+                    coord c = { x,y };
+                    ParseSand(raster, tile, c);
                 }
             }
         }
-        else {
-            pixel.SetAwake(false);
+    }
+}
+
+inline bool Physics::ParseSand(Raster& raster, Tile& tile, coord& c) {
+    int index = raster.CoordToIndex(c);
+    Pixel& pixel = raster.GetPixel(index);
+    if (!pixel.CheckState(PIXEL_UPDATED)) {
+        if (pixel.CheckState(PIXEL_EXISTS_AWAKE_DYNAMIC)) {
+            if (!AtBottomBound(c)) {
+                int bottomIndex = raster.GetBottom(index);
+                Pixel& bottomPixel = raster.GetPixel(bottomIndex);
+
+                // Move down
+                if (!bottomPixel.CheckState(PIXEL_EXISTS)) {
+                    Tile& tile2 = context->raster->GetTileFromRasterIndex(bottomIndex);
+                    raster.SwapPixels(tile,tile2,pixel, bottomPixel, index, bottomIndex);
+                }
+                else {
+                    int bottomLeftIndex = raster.GetBottomLeft(index);
+                    Pixel& bottomLeftPixel = raster.GetPixel(bottomLeftIndex);
+                    int bottomRightIndex = raster.GetBottomRight(index);
+                    Pixel& bottomRightPixel = raster.GetPixel(bottomRightIndex);
+
+                    // Can't fall
+                    if (!SandCanFall(c,bottomLeftPixel,bottomPixel,bottomRightPixel)
+                    ) {
+                        tile.RemoveAwake();
+                        pixel.SetAwake(false);
+                    }
+                    else {
+                        // Move left or right
+                        if (
+                            !bottomLeftPixel.CheckState(PIXEL_EXISTS) && 
+                            !bottomRightPixel.CheckState(PIXEL_EXISTS) && 
+                            !AtLeftBound(c) && 
+                            !AtRightBound(c)
+                        ) {
+                            if (std::rand() % 2 == 0) {
+                                Tile& tile2 = context->raster->GetTileFromRasterIndex(bottomLeftIndex);
+                                raster.SwapPixels(tile,tile2,pixel,bottomLeftPixel,index, bottomLeftIndex);
+                            }
+                            else {
+                                Tile& tile2 = context->raster->GetTileFromRasterIndex(bottomRightIndex);
+                                raster.SwapPixels(tile,tile2,pixel,bottomRightPixel,index, bottomRightIndex);
+                            }
+                        }
+                        else {
+                            if (!bottomLeftPixel.CheckState(PIXEL_EXISTS) && !AtLeftBound(c)) {
+                                Tile& tile2 = context->raster->GetTileFromRasterIndex(bottomLeftIndex);
+                                raster.SwapPixels(tile, tile2, pixel, bottomLeftPixel, index, bottomLeftIndex);
+                            }
+                            else if (!bottomRightPixel.CheckState(PIXEL_EXISTS) && !AtRightBound(c)) {
+                                Tile& tile2 = context->raster->GetTileFromRasterIndex(bottomRightIndex);
+                                raster.SwapPixels(tile, tile2, pixel, bottomRightPixel, index, bottomRightIndex);
+                            }
+                        }
+                    }
+                }
+            }
+            else {
+                tile.RemoveAwake();
+                pixel.SetAwake(false);
+            }
         }
     }
     return false;
 };
 
-void Physics::SwapPixels(Pixel& a, Pixel& b) {
-    swapPixel = a;
-    a = b;
-    b = swapPixel;
+bool Physics::SandCanFall(coord c, Pixel& bottomLeft, Pixel& bottom, Pixel& bottomRight) {
+    if (
+        (bottomLeft.IsNotSwappable() || AtLeftBound(c)) &&
+        (bottom.IsNotSwappable() || AtBottomBound(c)) &&
+        (bottomRight.IsNotSwappable() || AtRightBound(c))
+        ) {
+        return false;
+    }
+    return true;
 }
 
-bool Physics::AtBounds(size_t index) {
-    return  AtLeftBound(index) || AtRightBound(index) || AtTopBound(index) || AtBottomBound(index);
+bool Physics::AtBounds(coord& c) {
+    return  AtLeftBound(c) || AtRightBound(c) || AtTopBound(c) || AtBottomBound(c);
 }
 
-bool Physics::AtLeftBound(size_t index) {
-    return (index % context->VIEW_WIDTH) == 0;
+bool Physics::AtLeftBound(coord& c) {
+    return c.x == 0;
 }
 
-bool Physics::AtRightBound(size_t index) {
-    return (index % (context->VIEW_WIDTH)) == context->VIEW_WIDTH - 1;
+bool Physics::AtRightBound(coord& c) {
+    return c.x == context->RASTER_WIDTH - 1;
 }
 
-bool Physics::AtTopBound(size_t index) {
-    return (index < context->VIEW_WIDTH);
+bool Physics::AtTopBound(coord& c) {
+    return c.y == 0;
 }
 
-bool Physics::AtBottomBound(size_t index) {
-    return (index >= (context->TOTAL_PIXELS - context->VIEW_WIDTH));
-}
-
-int Physics::GetTileIndex(int pixelIndex) {
-    int x = (pixelIndex % context->VIEW_WIDTH) / tileWidth;
-    int y = (pixelIndex / context->VIEW_WIDTH) / tileHeight;
-    return (y * tileColumns) + x;
-}
-
-void Physics::MarkTileDirty(int pixelIndex) {
-    tiles[GetTileIndex(pixelIndex)].MarkDirty();
+bool Physics::AtBottomBound(coord& c) {
+    return c.y == context->RASTER_HEIGHT - 1;
 }

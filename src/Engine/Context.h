@@ -6,7 +6,7 @@
 #include "Input/InputManager.h"
 #include "Engine/ResourceManager.h"
 #include "Renderer/Palette.h"
-#include "Renderer/Raster.h"
+#include "Physics/Raster.h"
 #include "Renderer/Renderer.h"
 #include "Renderer/TextRenderer.h"
 #include "GameLogic/GameLogic.h"
@@ -37,11 +37,13 @@ public:
     int CANVAS_OFFSET_Y = 0;
 
     // View dimensions
-    int VIEW_WIDTH = 200;
-    int VIEW_HEIGHT = 150;
+    int RASTER_WIDTH = 200;
+    int RASTER_HEIGHT = 150;
 
     int CANVAS_MULTIPLIER = 4;
     int TOTAL_PIXELS = 30000;
+
+    int TILE_SIZE = 64;
 
     // Window
     SDL_bool fullscreen = SDL_bool::SDL_TRUE;

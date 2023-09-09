@@ -31,6 +31,7 @@ public:
     ~Renderer();
 
     void DrawPixels();
+    void DrawPixelsFromTiles();
     void RenderGame();
     void Render();
 

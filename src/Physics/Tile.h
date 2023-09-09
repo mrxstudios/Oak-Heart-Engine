@@ -1,18 +1,41 @@
 #pragma once
 
+#include "Engine/Types.h"
 #include "Engine/Context.h"
+#include "Physics/Pixel.h"
 
 class Context;
 
-class Tile
+struct Tile
 {
 public:
 	int x;
 	int y;
-	bool dirty;
+	int w;
+	int h;
 
-	Tile();
-	//Tile(int x, int y);
+	coord leftCorner;
+	bounds tileBounds;
+	bounds updateBounds;
+
+	int startIndex;
+	int totalPixels;
+	int occupiedPixels = 0;
+	int awakePixels = 0;
+
+	bool dirty;
+	
+	Tile(int x, int y, int w, int h, int startIndex, coord& leftCorner);
+
+	inline int GetPixelIndex(coord& c);
+	Pixel& GetPixel(coord& c);
+	Pixel& GetPixel(int index);
+	Pixel& GetPixelFromRasterSpace(coord& rasterC);
+
+	void UpdateRenderBounds(coord& c);
+
+	void RemoveAwake();
+	void AddAwake();
 
 	void MarkDirty();
 	void MarkClean();

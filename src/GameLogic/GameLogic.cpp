@@ -17,12 +17,12 @@ void GameLogic::InitGame() {
         //raster.emplace_back(Pixel{ std::rand() % 5 == 0 , BGRA{255,255,255,255} });
     }*/
 
-    /*const int centerX = sdl_data.VIEW_WIDTH / 4;
-    const int centerY = sdl_data.VIEW_HEIGHT / 4;
+    /*const int centerX = sdl_data.RASTER_WIDTH / 4;
+    const int centerY = sdl_data.RASTER_HEIGHT / 4;
     const int radius = 50; // Adjust this radius as needed
 
-    for (int y = 0; y < sdl_data.VIEW_WIDTH; ++y) {
-        for (int x = 0; x < sdl_data.VIEW_HEIGHT; ++x) {
+    for (int y = 0; y < sdl_data.RASTER_WIDTH; ++y) {
+        for (int x = 0; x < sdl_data.RASTER_HEIGHT; ++x) {
             int distance = static_cast<int>(std::sqrt((x - centerX) * (x - centerX) + (y - centerY) * (y - centerY)));
 
             if (distance <= radius) {
@@ -34,8 +34,8 @@ void GameLogic::InitGame() {
         }
     }*/
 
-    /*for (int y = 0; y < sdl_data.VIEW_HEIGHT; ++y) {
-        for (int x = 0; x < sdl_data.VIEW_WIDTH; ++x) {
+    /*for (int y = 0; y < sdl_data.RASTER_HEIGHT; ++y) {
+        for (int x = 0; x < sdl_data.RASTER_WIDTH; ++x) {
             if (x % 10 > 5) {
                 coord c = coord{ x,y };
                 raster.GetPixel(c).SetValue(11);
@@ -49,17 +49,17 @@ void GameLogic::Tick(double deltaTime) {
 }
 
 void GameLogic::SpawnRectangleOfSand() {
-    const int rectLeft = 200;      // Left boundary of the rectangle
-    const int rectRight = 800; // Right boundary of the rectangle
-
-    for (int x = 0; x < context->VIEW_WIDTH; x++) {
-        for (int y = 0; y < context->VIEW_HEIGHT; y++) {
+    const int rectLeft = 200;  // Left boundary of the rectangle
+    const int rectRight = 500; // Right boundary of the rectangle
+    for (int x = 0; x < context->RASTER_WIDTH; x++) {
+        for (int y = 0; y < context->RASTER_HEIGHT; y++) {
             if (x >= rectLeft && x <= rectRight) {
                 unsigned char noise = std::rand() % 50;
                 if (std::rand() % 5 == 0) {
                     coord c = coord{ x,y };
-                    context->raster->GetPixel(c).SetValue(11);
-                    context->raster->GetPixel(c).SetColor(context->palette->sandColors[rand() % 4]);
+                    //context->raster->GetPixel(c).SetValue(11);
+                    //context->raster->GetPixel(c).SetColor(context->palette->sandColors[rand() % 4]);
+                    context->raster->SetPixel(c, 11, context->palette->sandColors[rand() % 4]);
                 }
             }
         }

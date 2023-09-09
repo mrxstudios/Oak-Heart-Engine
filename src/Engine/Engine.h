@@ -4,7 +4,7 @@
 #include "Context.h"
 
 #include "Input/InputManager.h"
-#include "Renderer/Raster.h"
+#include "Physics/Raster.h"
 #include "Renderer/TextRenderer.h"
 #include "GameLogic/GameLogic.h"
 #include "Physics/Physics.h"
@@ -26,6 +26,7 @@ private:
     int frameCount;
 
     void Tick(double deltaTime);
+    void ParseEvents();
     void Render();
     void RenderGame();
 };

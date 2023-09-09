@@ -15,6 +15,18 @@ struct ARGB {
 	}
 };
 
+struct coord {
+	int x;
+	int y;
+};
+
+struct bounds {
+	int x1;
+	int y1;
+	int x2;
+	int y2;
+};
+
 struct Point {
 	int x;
 	int y;

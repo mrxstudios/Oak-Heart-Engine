@@ -22,7 +22,7 @@ void Context::Init() {
 
     inputManager = new InputManager();
     palette = new Palette();
-    raster = new Raster(this, VIEW_WIDTH, VIEW_HEIGHT);
+    raster = new Raster(this, RASTER_WIDTH, RASTER_HEIGHT);
     resourceManager = new ResourceManager(this);
     gameLogic = new GameLogic(this);
     physics = new Physics(this);
@@ -40,9 +40,9 @@ void Context::ApplyResolution() {
 
     CANVAS_MULTIPLIER = 4;
 
-    VIEW_WIDTH = CANVAS_WIDTH / CANVAS_MULTIPLIER;
-    VIEW_HEIGHT = CANVAS_HEIGHT / CANVAS_MULTIPLIER;
-    TOTAL_PIXELS = VIEW_WIDTH * VIEW_HEIGHT;
+    RASTER_WIDTH = CANVAS_WIDTH / CANVAS_MULTIPLIER;
+    RASTER_HEIGHT = CANVAS_HEIGHT / CANVAS_MULTIPLIER;
+    TOTAL_PIXELS = RASTER_WIDTH * RASTER_HEIGHT;
 }
 
 void Context::Destroy() {

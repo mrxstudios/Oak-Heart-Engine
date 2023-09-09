@@ -30,8 +30,6 @@ void Engine::Run()
 #if defined(_NSHIPPING) 
         PROFILE_SCOPE_RATE("FRAME", 1000); 
 #endif
-
-        auto frameStart = std::chrono::high_resolution_clock::now();
         context->inputManager->PollEvents();
 
         if (context->inputManager->IsQuitRequested() || context->inputManager->IsPressed_Escape()) {
@@ -39,22 +37,7 @@ void Engine::Run()
             break;
         }
 
-        if (context->inputManager->IsPressed_1()) context->debugFlags[1] = !context->debugFlags[1];
-        if (context->inputManager->IsPressed_2()) context->debugFlags[2] = !context->debugFlags[2];
-        if (context->inputManager->IsPressed_3()) context->debugFlags[3] = !context->debugFlags[3];
-
-        if (context->inputManager->IsDown_LeftMouse()) {
-            SDL_Point mouseLocation = context->inputManager->GetMousePosition();
-            coord location = coord{ (mouseLocation.x - context->CANVAS_OFFSET_X) / context->CANVAS_MULTIPLIER,(mouseLocation.y - context->CANVAS_OFFSET_Y) / context->CANVAS_MULTIPLIER };
-
-            context->raster->SetSquareToValue(location, PIXEL_EXISTS_AWAKE_DYNAMIC, context->palette->sandColors[rand() % 4], 3);
-        }
-        if (context->inputManager->IsDown_RightMouse()) {
-            SDL_Point mouseLocation = context->inputManager->GetMousePosition();
-            coord location = coord{ (mouseLocation.x - context->CANVAS_OFFSET_X) / context->CANVAS_MULTIPLIER,(mouseLocation.y - context->CANVAS_OFFSET_Y) / context->CANVAS_MULTIPLIER };
-            
-            context->raster->SetSquareToValue(location, PIXEL_EXISTS,196,2);
-        }
+        auto frameStart = std::chrono::high_resolution_clock::now();
 
         double deltaTime = (frameStart - lastFrameTime).count();
         Tick(deltaTime);
@@ -68,6 +51,24 @@ void Engine::Run()
     }
 }
 
+void Engine::ParseEvents() {
+    if (context->inputManager->IsPressed_1()) context->debugFlags[1] = !context->debugFlags[1];
+    if (context->inputManager->IsPressed_2()) context->debugFlags[2] = !context->debugFlags[2];
+    if (context->inputManager->IsPressed_3()) context->debugFlags[3] = !context->debugFlags[3];
+
+    if (context->inputManager->IsDown_LeftMouse()) {
+        SDL_Point mouseLocation = context->inputManager->GetMousePosition();
+        coord location = coord{ (mouseLocation.x - context->CANVAS_OFFSET_X) / context->CANVAS_MULTIPLIER,(mouseLocation.y - context->CANVAS_OFFSET_Y) / context->CANVAS_MULTIPLIER };
+        context->raster->SetSquareToValue(location, PIXEL_EXISTS_AWAKE_DYNAMIC, context->palette->sandColors[rand() % 4], 4);
+    }
+    if (context->inputManager->IsDown_RightMouse()) {
+        SDL_Point mouseLocation = context->inputManager->GetMousePosition();
+        coord location = coord{ (mouseLocation.x - context->CANVAS_OFFSET_X) / context->CANVAS_MULTIPLIER,(mouseLocation.y - context->CANVAS_OFFSET_Y) / context->CANVAS_MULTIPLIER };
+
+        context->raster->SetSquareToValue(location, PIXEL_EXISTS, 196, 2);
+    }
+}
+
 void Engine::Terminate()
 {
     context->Destroy();
@@ -76,9 +77,11 @@ void Engine::Terminate()
 void Engine::Tick(double deltaTime)
 {
     context->gameLogic->Tick(deltaTime);
+    ParseEvents();
     context->physics->Tick(deltaTime);
     context->debug->Tick();
     Render();
+    context->raster->CleanTiles();
 }
 
 void Engine::Render()

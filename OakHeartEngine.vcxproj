@@ -205,7 +205,7 @@
     <ClCompile Include="src\Debug\Debug.cpp" />
     <ClCompile Include="src\Engine\ResourceManager.cpp" />
     <ClCompile Include="src\GameLogic\GameLogic.cpp" />
-    <ClCompile Include="src\Renderer\Raster.cpp" />
+    <ClCompile Include="src\Physics\Raster.cpp" />
     <ClCompile Include="src\Renderer\TextRenderer.cpp" />
     <ClCompile Include="src\Scripting\ScriptingManager.cpp" />
     <ClCompile Include="src\Renderer\Renderer.cpp" />
@@ -229,8 +229,8 @@
     <ClInclude Include="src\Debug\Debug.h" />
     <ClInclude Include="src\Engine\ResourceManager.h" />
     <ClInclude Include="src\GameLogic\GameLogic.h" />
-    <ClInclude Include="src\Renderer\Pixel.h" />
-    <ClInclude Include="src\Renderer\Raster.h" />
+    <ClInclude Include="src\Physics\Pixel.h" />
+    <ClInclude Include="src\Physics\Raster.h" />
     <ClInclude Include="src\Renderer\TextRenderer.h" />
     <ClInclude Include="src\Scripting\ScriptingManager.h" />
     <ClInclude Include="src\Renderer\Renderer.h" />

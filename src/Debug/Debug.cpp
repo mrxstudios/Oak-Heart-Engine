@@ -28,28 +28,31 @@ void Debug::ProfilingInfo() {
 
 void Debug::RenderTiles() {
 	ARGB borderColor{ 150,255,255,255 };
-	ARGB fillColor{ 50,255,255,255 };
-	for (size_t y = 0; y < context->physics->tileRows; y++) {
-		for (size_t x = 0; x < context->physics->tileColumns; x++) {
-			int index = (context->physics->tileColumns * y) + x;
-			if (context->physics->tiles[index].IsDirty()) {
-				context->gameRenderer->DrawFilledRectangle(
-					x * context->physics->tileWidth,
-					y * context->physics->tileHeight,
-					context->physics->tileWidth,
-					context->physics->tileHeight,
-					borderColor,
-					true
-				);
-			}
+	ARGB fillColor{ 255,0,255,0 };
+	for (size_t ti = 0; ti < context->raster->tileCount; ti++) {
+		Tile& tile = context->raster->GetTile(ti);
+		if (tile.awakePixels > 0 || tile.IsDirty()) {
 			context->gameRenderer->DrawRectangle(
-				x * context->physics->tileWidth, 
-				y * context->physics->tileHeight, 
-				context->physics->tileWidth,
-				context->physics->tileHeight,
-				borderColor,
+				tile.updateBounds.x1,
+				tile.updateBounds.y1,
+				tile.updateBounds.x2 - tile.updateBounds.x1 + 1,
+				tile.updateBounds.y2 - tile.updateBounds.y1 + 1,
+				fillColor,
 				true
 			);
+		}
+		context->gameRenderer->DrawRectangle(
+			tile.tileBounds.x1,
+			tile.tileBounds.y1,
+			tile.w,
+			tile.h,
+			borderColor,
+			true
+		);
+	}
+	for (size_t y = 0; y < context->raster->rows; y++) {
+		for (size_t x = 0; x < context->raster->columns; x++) {
+			
 		}
 	}
 }
