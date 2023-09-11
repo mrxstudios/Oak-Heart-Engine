@@ -18,12 +18,15 @@ public:
 	bounds tileBounds;
 	bounds updateBounds;
 
+	int neighbourIndices[8];
+
 	int startIndex;
 	int totalPixels;
 	int occupiedPixels = 0;
 	int awakePixels = 0;
 
-	bool dirty;
+	bool shouldRender;
+	bool shouldStep;
 	
 	Tile(int x, int y, int w, int h, int startIndex, coord& leftCorner);
 
@@ -36,9 +39,5 @@ public:
 
 	void RemoveAwake();
 	void AddAwake();
-
-	void MarkDirty();
-	void MarkClean();
-	bool IsDirty();
 };
 

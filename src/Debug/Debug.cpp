@@ -28,16 +28,36 @@ void Debug::ProfilingInfo() {
 
 void Debug::RenderTiles() {
 	ARGB borderColor{ 150,255,255,255 };
-	ARGB fillColor{ 255,0,255,0 };
+	ARGB stepBorderColor{ 150,0,255,255 };
+	ARGB fillColor{ 50,255,255,255 };
+	ARGB updateColor{ 255,0,255,0 };
 	for (size_t ti = 0; ti < context->raster->tileCount; ti++) {
 		Tile& tile = context->raster->GetTile(ti);
-		if (tile.awakePixels > 0 || tile.IsDirty()) {
+		if (tile.shouldRender) {
+			context->gameRenderer->DrawFilledRectangle(
+				tile.tileBounds.x1,
+				tile.tileBounds.y1,
+				tile.w,
+				tile.h,
+				fillColor,
+				true
+			);
 			context->gameRenderer->DrawRectangle(
 				tile.updateBounds.x1,
 				tile.updateBounds.y1,
 				tile.updateBounds.x2 - tile.updateBounds.x1 + 1,
 				tile.updateBounds.y2 - tile.updateBounds.y1 + 1,
-				fillColor,
+				updateColor,
+				true
+			);
+		}
+		if (tile.shouldStep) {
+			context->gameRenderer->DrawRectangle(
+				tile.tileBounds.x1 + 1,
+				tile.tileBounds.y1 + 1,
+				tile.w - 1,
+				tile.h - 1,
+				stepBorderColor,
 				true
 			);
 		}

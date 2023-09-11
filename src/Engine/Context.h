@@ -11,6 +11,7 @@
 #include "Renderer/TextRenderer.h"
 #include "GameLogic/GameLogic.h"
 #include "Physics/Physics.h"
+#include "Utility/ThreadPool.h"
 #include "Debug/Debug.h"
 
 
@@ -22,6 +23,7 @@ class GameLogic;
 class Physics;
 class Renderer;
 class TextRenderer;
+class ThreadPool;
 class Debug;
 
 class Context {
@@ -40,7 +42,7 @@ public:
     int RASTER_WIDTH = 200;
     int RASTER_HEIGHT = 150;
 
-    int CANVAS_MULTIPLIER = 4;
+    int CANVAS_MULTIPLIER = 2;
     int TOTAL_PIXELS = 30000;
 
     int TILE_SIZE = 64;

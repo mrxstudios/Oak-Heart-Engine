@@ -59,13 +59,13 @@ void Engine::ParseEvents() {
     if (context->inputManager->IsDown_LeftMouse()) {
         SDL_Point mouseLocation = context->inputManager->GetMousePosition();
         coord location = coord{ (mouseLocation.x - context->CANVAS_OFFSET_X) / context->CANVAS_MULTIPLIER,(mouseLocation.y - context->CANVAS_OFFSET_Y) / context->CANVAS_MULTIPLIER };
-        context->raster->SetSquareToValue(location, PIXEL_EXISTS_AWAKE_DYNAMIC, context->palette->sandColors[rand() % 4], 4);
+        context->raster->SetSquareToValue(location, PIXEL_EXISTS_UPDATED_DYNAMIC, context->palette->sandColors[rand() % 4], 4);
     }
     if (context->inputManager->IsDown_RightMouse()) {
         SDL_Point mouseLocation = context->inputManager->GetMousePosition();
         coord location = coord{ (mouseLocation.x - context->CANVAS_OFFSET_X) / context->CANVAS_MULTIPLIER,(mouseLocation.y - context->CANVAS_OFFSET_Y) / context->CANVAS_MULTIPLIER };
 
-        context->raster->SetSquareToValue(location, PIXEL_EXISTS, 196, 2);
+        context->raster->SetSquareToValue(location, PIXEL_EXISTS_UPDATED, 196, 2);
     }
 }
 
@@ -81,7 +81,6 @@ void Engine::Tick(double deltaTime)
     context->physics->Tick(deltaTime);
     context->debug->Tick();
     Render();
-    context->raster->CleanTiles();
 }
 
 void Engine::Render()

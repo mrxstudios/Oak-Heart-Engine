@@ -6,13 +6,13 @@
 
 #define PIXEL_EMPTY 0
 #define PIXEL_EXISTS 1
-#define PIXEL_AWAKE 2
-#define PIXEL_EXISTS_AWAKE 3
-#define PIXEL_UPDATED 4
-#define PIXEL_AWAKE_UPDATED 6
-#define PIXEL_DYNAMIC 8
-#define PIXEL_EXISTS_DYNAMIC 9
-#define PIXEL_EXISTS_AWAKE_DYNAMIC 11
+#define PIXEL_UPDATED 2
+#define PIXEL_EXISTS_UPDATED 3
+#define PIXEL_DYNAMIC 4
+#define PIXEL_EXISTS_DYNAMIC 5
+#define PIXEL_UPDATED_DYNAMIC 6
+#define PIXEL_EXISTS_UPDATED_DYNAMIC 7
+
 
 struct Pixel {
 	uint8_t bitmask1 = 0;
@@ -20,19 +20,14 @@ struct Pixel {
 
 	/*
 	* 00000000
-	*     duae
+	*      due
 	* e: Exists
-	* a: Is Awake
 	* u: Updated
 	* d: Is Dynamic
 	*/
 
 	inline void SetExists(bool state) {
 		state ? SetBit(PIXEL_EXISTS) : ClearBit(PIXEL_EXISTS);
-	}
-
-	inline void SetAwake(bool state) {
-		state ? SetBit(PIXEL_AWAKE) : ClearBit(PIXEL_AWAKE);
 	}
 
 	inline void SetUpdated(bool state) {
@@ -69,13 +64,5 @@ struct Pixel {
 
 	inline bool CheckState(int n) {
 		return (bitmask1 & n) == n;
-	}
-
-	inline bool IsNotSwappable() {
-		return ((CheckState(PIXEL_EXISTS) && !CheckState(PIXEL_AWAKE)));
-	}
-
-	inline bool IsWakable() {
-		return (!CheckState(PIXEL_AWAKE_UPDATED) && CheckState(PIXEL_EXISTS_DYNAMIC));
 	}
 };

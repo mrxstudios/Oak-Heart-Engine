@@ -4,6 +4,7 @@
 #include "Physics/Pixel.h"
 #include "Physics/Tile.h"
 #include "Debug/Debug.h"
+#include "Utility/ThreadPool.h"
 
 
 class Context;
@@ -27,14 +28,13 @@ public:
 	Physics(Context* context);
 
 	void Tick(double deltaTime);
+	inline bool ParseSand(Raster& raster, Tile& tile, coord& c);
 
 	friend class Debug;
 
 private:
-
-	inline bool ParseSand(Raster& raster, Tile& tile, coord& c);
+	void ParseColumn(Raster& raster, bounds& b);
 	inline bool SandCanFall(coord c, Pixel& bottomLeft, Pixel& bottom, Pixel& bottomRight);
-
 
 	inline bool AtBounds(coord& c);
 	inline bool AtLeftBound(coord& c);

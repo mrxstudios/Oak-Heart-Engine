@@ -41,11 +41,8 @@ public:
 
 	inline int GetTileIndex(coord& c);
 	inline int GetTileIndex(const int index);
-
-	void MarkTileDirty(coord& c);
 	
-	void ResetPixelUpdatedState();
-	void CleanTiles();
+	void ResetTilesAndPixels();
 
 	inline coord IndexToCoord(const int index);
 	inline int CoordToIndex(coord& c);
@@ -69,4 +66,10 @@ public:
 	inline bool AtRightBound(const int index);
 	inline bool AtTopBound(const int index);
 	inline bool AtBottomBound(const int index);
+
+	inline bool AtTileBounds(const int index);
+	inline bool AtTileLeftBound(const int index);
+	inline bool AtTileRightBound(const int index);
+	inline bool AtTileTopBound(const int index);
+	inline bool AtTileBottomBound(const int index);
 };

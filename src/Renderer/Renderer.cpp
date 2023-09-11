@@ -70,7 +70,7 @@ void Renderer::DrawPixelsFromTiles() {
 
     for (size_t ti = 0; ti < raster.tileCount; ti++) {
         Tile& tile = raster.GetTile(ti);
-        if (tile.awakePixels > 0 || tile.IsDirty()) {
+        if (tile.shouldRender) {
             for (size_t y = tile.updateBounds.y1; y <= tile.updateBounds.y2; y++) {
                 for (size_t x = tile.updateBounds.x1; x <= tile.updateBounds.x2; x++) {
                     int pixelIndex = y * context->RASTER_WIDTH + x;

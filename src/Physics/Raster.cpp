@@ -6,7 +6,7 @@ Raster::Raster(Context* context, int width, int height) : context(context), widt
 	pixels = new Pixel[size];
 
 	for (size_t i = 0; i < size; i++) {
-		pixels[i] = Pixel{ 0 };
+		pixels[i] = Pixel{ 0,0 };
 	}
 }
 
@@ -39,6 +39,16 @@ void Raster::GenerateTiles() {
 			coord leftCorner = { x * context->TILE_SIZE, y * context->TILE_SIZE };
 
 			tiles.push_back(Tile(x, y, width, height, startIndex, leftCorner));
+			Tile& tile = tiles.back();
+
+			/*t */if (index >= columns) tile.neighbourIndices[0] = index - columns;
+			/*tr*/if ((index >= columns) && (index % columns < (columns - 1))) tile.neighbourIndices[1] = index - columns + 1;
+			/*r */if (index % columns < (columns - 1)) tile.neighbourIndices[2] = index + 1;
+			/*br*/if ((index < (rows - 1) * columns) && (index % columns < (columns - 1))) tile.neighbourIndices[3] = index + columns + 1;
+			/*b */if (index < (rows - 1) * columns) tile.neighbourIndices[4] = index + columns;
+			/*bl*/if ((index < (rows - 1) * columns) && (index % columns > 0)) tile.neighbourIndices[5] = index + columns - 1;
+			/*l */if (index % columns > 0) tile.neighbourIndices[6] = index - 1;
+			/*tl*/if ((index % columns > 0) && (index >= columns)) tile.neighbourIndices[7] = index - columns - 1;
 		}
 	}
 }
@@ -49,109 +59,16 @@ void Raster::SetPixel(coord& c, int value, uint8_t color) {
 	Pixel& pixel = pixels[pixelIndex];
 
 	if ((value & PIXEL_EXISTS) == PIXEL_EXISTS) {
-		if (pixel.CheckState(PIXEL_EMPTY)) {
+		if (!pixel.CheckState(PIXEL_EXISTS)) {
 			tile.occupiedPixels++;
-		}
-	}
-	else {
-		if (!pixel.CheckState(PIXEL_EMPTY)) {
-			tile.occupiedPixels--;
-		}
-	}
-	if ((value & PIXEL_AWAKE) == PIXEL_AWAKE) {
-		if (!pixel.CheckState(PIXEL_AWAKE)) {
-			tile.AddAwake();
-			pixel.SetBit(PIXEL_AWAKE);
-			//WakeNeighbors(pixelIndex);
-		}
-	}
-	else {
-		if (pixel.CheckState(PIXEL_AWAKE)) {
-			pixel.ClearBit(PIXEL_AWAKE);
-			tile.RemoveAwake();
 		}
 	}
 
 	pixels[CoordToIndex(c)].SetValueAndColor(value,color);
 	tile.UpdateRenderBounds(c);
 
-	tile.MarkDirty();
-}
-
-void Raster::WakeNeighbors(const int index) {
-	bool top = AtTopBound(index);
-	bool right = AtRightBound(index);
-	bool bottom = AtBottomBound(index);
-	bool left = AtLeftBound(index);
-	bool topright = top || right;
-	bool bottomright = bottom || right;
-	bool bottomleft = bottom || left;
-	bool topleft = top || left;
-
-	if (!top) {
-		int tempIndex = GetTop(index);
-		Pixel& temp = pixels[tempIndex];
-		if (!temp.IsWakable()) {
-			temp.SetBit(PIXEL_AWAKE_UPDATED);
-			GetTileFromRasterIndex(tempIndex).AddAwake();
-		}
-	}
-	if (!topright) {
-		int tempIndex = GetTopRight(index);
-		Pixel& temp = pixels[tempIndex];
-		if (!temp.IsWakable()) {
-			temp.SetBit(PIXEL_AWAKE_UPDATED);
-			GetTileFromRasterIndex(tempIndex).AddAwake();
-		}
-	}
-	if (!right) {
-		int tempIndex = GetRight(index);
-		Pixel& temp = pixels[tempIndex];
-		if (!temp.IsWakable()) {
-			temp.SetBit(PIXEL_AWAKE_UPDATED);
-			GetTileFromRasterIndex(tempIndex).AddAwake();
-		}
-	}
-	if (!bottomright) {
-		int tempIndex = GetBottomRight(index);
-		Pixel& temp = pixels[tempIndex];
-		if (!temp.IsWakable()) {
-			temp.SetBit(PIXEL_AWAKE_UPDATED);
-			GetTileFromRasterIndex(tempIndex).AddAwake();
-		}
-	}
-	if (!bottom) {
-		int tempIndex = GetBottom(index);
-		Pixel& temp = pixels[tempIndex];
-		if (!temp.IsWakable()) {
-			temp.SetBit(PIXEL_AWAKE_UPDATED);
-			GetTileFromRasterIndex(tempIndex).AddAwake();
-		}
-	}
-	if (!bottomleft) {
-		int tempIndex = GetBottomLeft(index);
-		Pixel& temp = pixels[tempIndex];
-		if (!temp.IsWakable()) {
-			temp.SetBit(PIXEL_AWAKE_UPDATED);
-			GetTileFromRasterIndex(tempIndex).AddAwake();
-		}
-	}
-	if (!left) {
-		int tempIndex = GetLeft(index);
-		Pixel& temp = pixels[tempIndex];
-		if (!temp.IsWakable()) {
-			temp.SetBit(PIXEL_AWAKE_UPDATED);
-			GetTileFromRasterIndex(tempIndex).AddAwake();
-		}
-	}
-	if (!topleft) {
-		int tempIndex = GetTopLeft(index);
-		Pixel& temp = pixels[tempIndex];
-		if (!temp.IsWakable()) {
-			temp.SetBit(PIXEL_AWAKE_UPDATED);
-			GetTileFromRasterIndex(tempIndex).AddAwake();
-		}
-	}
+	tile.shouldRender = true;
+	tile.shouldStep = true;
 }
 
 Pixel& Raster::GetPixel(const int index) {
@@ -184,14 +101,10 @@ int Raster::GetTileIndex(coord& c) {
 	return (c.y / context->TILE_SIZE) * columns + (c.x / context->TILE_SIZE);
 }
 
-void Raster::MarkTileDirty(coord& c) {
-	GetTile(c).MarkDirty();
-}
-
-void Raster::ResetPixelUpdatedState() {
+void Raster::ResetTilesAndPixels() {
 	for (size_t i = 0; i < tileCount; i++) {
-		Tile& tile = tiles[i];
-		if (tile.awakePixels > 0) {
+ 		Tile& tile = tiles[i];
+		if (tile.shouldRender) {
 			for (size_t x = tile.tileBounds.x1; x < tile.tileBounds.x2; x++) {
 				for (size_t y = tile.tileBounds.y1; y < tile.tileBounds.y2; y++) {
 					int index = y * context->RASTER_WIDTH + x;
@@ -199,14 +112,21 @@ void Raster::ResetPixelUpdatedState() {
 				}
 			}
 		}
-	}
-}
+		tile.shouldStep = tile.shouldRender;
 
+		// If a neighbouring tile was set to Render previous frame, run physics this frame.
+		if (!tile.shouldStep && tile.occupiedPixels > 0) {
+			for (size_t j = 0; j < 8; j++) {
+				int index = tile.neighbourIndices[j];
+				if (index < 0) continue;
+				if (tiles[tile.neighbourIndices[j]].shouldRender) {
+					tile.shouldStep = true;
+					break;
+				}
+			}
+		}
 
-void Raster::CleanTiles() {
-	for (size_t i = 0; i < tileCount; i++) {
-		Tile& tile = tiles[i];
-		tile.dirty = false;
+		tile.shouldRender = false;
 		tile.updateBounds = { 0,0,0,0 };
 	}
 }
@@ -249,18 +169,13 @@ void Raster::SwapPixels(Tile& tile1, Tile& tile2, Pixel& pixel1, Pixel& pixel2, 
 	pixel1.SetBit(PIXEL_UPDATED);
 	pixel2.SetBit(PIXEL_UPDATED);
 
-	//WakeNeighbors(index1);
-	//WakeNeighbors(index2);
+	tile1.shouldRender = true;
+	tile2.shouldRender = true;
 
 	if (tile1.startIndex != tile2.startIndex) {
 		if (pixel2.CheckState(PIXEL_EMPTY)) {
 			tile1.occupiedPixels--;
 			tile2.occupiedPixels++;
-			tile1.RemoveAwake();
-			tile2.AddAwake();
-		}
-		else if (!pixel2.CheckState(PIXEL_AWAKE)) {
-			tile2.AddAwake();
 		}
 	}
 
@@ -307,15 +222,35 @@ bool Raster::AtTopBound(const int index) {
 }
 
 bool Raster::AtRightBound(const int index) {
-	return index % context->RASTER_WIDTH < context->RASTER_WIDTH - 1;
+	return (index % context->RASTER_WIDTH) == (context->RASTER_WIDTH - 1);
 }
 
 bool Raster::AtBottomBound(const int index) {
-	return index < context->TOTAL_PIXELS - context->RASTER_WIDTH;
+	return index >= (context->TOTAL_PIXELS - context->RASTER_WIDTH);
 }
 
 bool Raster::AtLeftBound(const int index) {
-	return index % context->RASTER_WIDTH > 0;
+	return (index % context->RASTER_WIDTH) == 0;
+}
+
+bool Raster::AtTileBounds(const int index) {
+	return AtTileTopBound(index) || AtTileRightBound(index) || AtTileBottomBound(index) || AtTileLeftBound(index);
+}
+
+bool Raster::AtTileTopBound(const int index) {
+	return ((index / context->RASTER_WIDTH) % context->TILE_SIZE) == 0;
+}
+
+bool Raster::AtTileRightBound(const int index) {
+	return (index % context->TILE_SIZE) == (context->TILE_SIZE - 1);
+}
+
+bool Raster::AtTileBottomBound(const int index) {
+	return ((index / context->RASTER_WIDTH) % context->TILE_SIZE) == (context->TILE_SIZE - 1);
+}
+
+bool Raster::AtTileLeftBound(const int index) {
+	return (index % context->TILE_SIZE) == 0;
 }
 
 

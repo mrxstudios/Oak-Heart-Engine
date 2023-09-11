@@ -27,6 +27,17 @@ struct bounds {
 	int y2;
 };
 
+struct neighbours {
+	int t	= -1;	// top
+	int tr	= -1;	// top-right
+	int r	= -1;	// right
+	int br	= -1;	// bottom-right
+	int b	= -1;	// bottom
+	int bl	= -1;	// bottom-left
+	int l	= -1;	// left
+	int tl	= -1;	// top-left
+};
+
 struct Point {
 	int x;
 	int y;

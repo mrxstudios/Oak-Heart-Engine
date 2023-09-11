@@ -12,7 +12,12 @@ x(x), y(y), w(w), h(h), startIndex(startIndex), leftCorner(leftCorner)
 	};
 	totalPixels = w * h;
 	occupiedPixels = 0;
-	dirty = false;
+	shouldRender = true;
+	shouldStep = false;
+
+	for (size_t i = 0; i < 8; i++) {
+		neighbourIndices[i] = -1;
+	}
 };
 
 void Tile::UpdateRenderBounds(coord& c) {
@@ -24,25 +29,4 @@ void Tile::UpdateRenderBounds(coord& c) {
 	if (c.x > updateBounds.x2) updateBounds.x2 = c.x;
 	if (c.y < updateBounds.y1) updateBounds.y1 = c.y;
 	if (c.y > updateBounds.y2) updateBounds.y2 = c.y;
-}
-
-void Tile::RemoveAwake() {
-	awakePixels--;
-	if (awakePixels == 0) MarkDirty();
-}
-
-void Tile::AddAwake() {
-	awakePixels++;
-}
-
-void Tile::MarkClean() {
-	dirty = false;
-}
-
-void Tile::MarkDirty() {
-	dirty = true;
-}
-
-bool Tile::IsDirty() {
-	return dirty;
 }
