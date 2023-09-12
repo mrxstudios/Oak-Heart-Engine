@@ -59,7 +59,7 @@ void GameLogic::SpawnRectangleOfSand() {
                     coord c = coord{ x,y };
                     //context->raster->GetPixel(c).SetValue(11);
                     //context->raster->GetPixel(c).SetColor(context->palette->sandColors[rand() % 4]);
-                    context->raster->SetPixel(c, PIXEL_EXISTS_UPDATED_DYNAMIC, context->palette->sandColors[rand() % 4]);
+                    context->raster->SetPixel(c, PIXEL_EXISTS_UPDATED_DYNAMIC + PIXEL_TYPE_SAND, context->palette->sandColors[rand() % 4]);
                 }
             }
         }

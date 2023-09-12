@@ -12,6 +12,8 @@
 #define PIXEL_EXISTS_DYNAMIC 5
 #define PIXEL_UPDATED_DYNAMIC 6
 #define PIXEL_EXISTS_UPDATED_DYNAMIC 7
+#define PIXEL_TYPE_SAND 16
+#define PIXEL_TYPE_WATER 32
 
 
 struct Pixel {
@@ -20,10 +22,11 @@ struct Pixel {
 
 	/*
 	* 00000000
-	*      due
+	* tttt due
 	* e: Exists
 	* u: Updated
 	* d: Is Dynamic
+	* t: type
 	*/
 
 	inline void SetExists(bool state) {

@@ -14,7 +14,14 @@ void Physics::Tick(double deltaTime) {
             for (size_t y = tile.tileBounds.y1; y < tile.tileBounds.y2; y++) {
                 for (size_t x = tile.tileBounds.x1; x < tile.tileBounds.x2; x++) {
                     coord c = { x,y };
-                    ParseSand(raster, tile, c);
+                    int index = raster.CoordToIndex(c);
+                    Pixel& pixel = raster.GetPixel(index);
+                    if (pixel.CheckState(PIXEL_TYPE_SAND)) {
+                        ParseSand(raster, tile, pixel, c, index);
+                    }
+                    else if (pixel.CheckState(PIXEL_TYPE_WATER)) {
+                        ParseWater(raster, tile, pixel, c, index);
+                    }
                 }
             }
         }
@@ -26,15 +33,15 @@ void Physics::ParseColumn(Raster& raster, bounds& b) {
     for (size_t y = b.y1; y < b.y2; y++) {
         for (size_t x = b.x1; y < b.x2; x++) {
             coord c = { x,y };
+            int index = raster.CoordToIndex(c);
             Tile& tile = raster.GetTile(c);
-            ParseSand(raster, tile, c);
+            Pixel& pixel = raster.GetPixel(index);
+            ParseSand(raster, tile, pixel, c, index);
         }
     }
 }
 
-inline bool Physics::ParseSand(Raster& raster, Tile& tile, coord& c) {
-    int index = raster.CoordToIndex(c);
-    Pixel& pixel = raster.GetPixel(index);
+inline bool Physics::ParseSand(Raster& raster, Tile& tile, Pixel& pixel, coord& c, const int index) {
     if (!pixel.CheckState(PIXEL_UPDATED)) {
         if (pixel.CheckState(PIXEL_EXISTS_DYNAMIC)) {
             if (!AtBottomBound(c)) {
@@ -42,7 +49,7 @@ inline bool Physics::ParseSand(Raster& raster, Tile& tile, coord& c) {
                 Pixel& bottomPixel = raster.GetPixel(bottomIndex);
 
                 // Move down
-                if (!bottomPixel.CheckState(PIXEL_EXISTS)) {
+                if (!bottomPixel.CheckState(PIXEL_EXISTS) || bottomPixel.CheckState(PIXEL_TYPE_WATER)) {
                     Tile& tile2 = context->raster->GetTileFromRasterIndex(bottomIndex);
                     raster.SwapPixels(tile,tile2,pixel, bottomPixel, index, bottomIndex);
                 }
@@ -53,7 +60,7 @@ inline bool Physics::ParseSand(Raster& raster, Tile& tile, coord& c) {
                     Pixel& bottomRightPixel = raster.GetPixel(bottomRightIndex);
 
                     // Can't fall
-                    if (SandCanFall(c, bottomLeftPixel, bottomPixel, bottomRightPixel)) {
+                    if (PixelCanFall(c, bottomLeftPixel, bottomPixel, bottomRightPixel)) {
                         // Move left or right
                         if (
                             !bottomLeftPixel.CheckState(PIXEL_EXISTS) && 
@@ -88,12 +95,111 @@ inline bool Physics::ParseSand(Raster& raster, Tile& tile, coord& c) {
     return false;
 };
 
-bool Physics::SandCanFall(coord c, Pixel& bottomLeft, Pixel& bottom, Pixel& bottomRight) {
+inline bool Physics::ParseWater(Raster& raster, Tile& tile, Pixel& pixel, coord& c, const int index) {
+    if (!pixel.CheckState(PIXEL_UPDATED)) {
+        if (pixel.CheckState(PIXEL_EXISTS_DYNAMIC)) {
+            if (!AtBottomBound(c)) {
+                int bottomIndex = raster.GetBottom(index);
+                Pixel& bottomPixel = raster.GetPixel(bottomIndex);
+
+                // Move down
+                if (!bottomPixel.CheckState(PIXEL_EXISTS)) {
+                    Tile& tile2 = context->raster->GetTileFromRasterIndex(bottomIndex);
+                    raster.SwapPixels(tile, tile2, pixel, bottomPixel, index, bottomIndex);
+                }
+                else {
+                    int bottomLeftIndex = raster.GetBottomLeft(index);
+                    Pixel& bottomLeftPixel = raster.GetPixel(bottomLeftIndex);
+                    int bottomRightIndex = raster.GetBottomRight(index);
+                    Pixel& bottomRightPixel = raster.GetPixel(bottomRightIndex);
+
+                    // Can't fall
+                    if (PixelCanFall(c, bottomLeftPixel, bottomPixel, bottomRightPixel)) {
+                        // Move left or right
+                        if (
+                            !bottomLeftPixel.CheckState(PIXEL_EXISTS) &&
+                            !bottomRightPixel.CheckState(PIXEL_EXISTS) &&
+                            !AtLeftBound(c) &&
+                            !AtRightBound(c)
+                            ) {
+                            if (std::rand() % 2 == 0) {
+                                Tile& tile2 = context->raster->GetTileFromRasterIndex(bottomLeftIndex);
+                                raster.SwapPixels(tile, tile2, pixel, bottomLeftPixel, index, bottomLeftIndex);
+                            }
+                            else {
+                                Tile& tile2 = context->raster->GetTileFromRasterIndex(bottomRightIndex);
+                                raster.SwapPixels(tile, tile2, pixel, bottomRightPixel, index, bottomRightIndex);
+                            }
+                        }
+                        else {
+                            if (!bottomLeftPixel.CheckState(PIXEL_EXISTS)) {
+                                Tile& tile2 = context->raster->GetTileFromRasterIndex(bottomLeftIndex);
+                                raster.SwapPixels(tile, tile2, pixel, bottomLeftPixel, index, bottomLeftIndex);
+                            }
+                            else {
+                                Tile& tile2 = context->raster->GetTileFromRasterIndex(bottomRightIndex);
+                                raster.SwapPixels(tile, tile2, pixel, bottomRightPixel, index, bottomRightIndex);
+                            }
+                        }
+                    }
+                    else {
+                        int leftIndex = raster.GetLeft(index);
+                        Pixel& leftPixel = raster.GetPixel(leftIndex);
+                        int rightIndex = raster.GetRight(index);
+                        Pixel& rightPixel = raster.GetPixel(rightIndex);
+
+                        if (PixelCanFloat(c, leftPixel, rightPixel)) {
+                            // Move left or right
+                            if (
+                                !leftPixel.CheckState(PIXEL_EXISTS) &&
+                                !rightPixel.CheckState(PIXEL_EXISTS) &&
+                                !AtLeftBound(c) &&
+                                !AtRightBound(c)
+                                ) {
+                                if (std::rand() % 2 == 0) {
+                                    Tile& tile2 = context->raster->GetTileFromRasterIndex(leftIndex);
+                                    raster.SwapPixels(tile, tile2, pixel, leftPixel, index, leftIndex);
+                                }
+                                else {
+                                    Tile& tile2 = context->raster->GetTileFromRasterIndex(rightIndex);
+                                    raster.SwapPixels(tile, tile2, pixel, rightPixel, index, rightIndex);
+                                }
+                            }
+                            else {
+                                if (!bottomLeftPixel.CheckState(PIXEL_EXISTS)) {
+                                    Tile& tile2 = context->raster->GetTileFromRasterIndex(leftIndex);
+                                    raster.SwapPixels(tile, tile2, pixel, leftPixel, index, leftIndex);
+                                }
+                                else {
+                                    Tile& tile2 = context->raster->GetTileFromRasterIndex(rightIndex);
+                                    raster.SwapPixels(tile, tile2, pixel, rightPixel, index, rightIndex);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return false;
+};
+
+bool Physics::PixelCanFall(coord c, Pixel& bottomLeft, Pixel& bottom, Pixel& bottomRight) {
     if (
         (bottomLeft.CheckState(PIXEL_EXISTS) || AtLeftBound(c)) &&
         (bottom.CheckState(PIXEL_EXISTS) || AtBottomBound(c)) &&
         (bottomRight.CheckState(PIXEL_EXISTS) || AtRightBound(c))
     ) {
+        return false;
+    }
+    return true;
+}
+
+bool Physics::PixelCanFloat(coord c, Pixel& left, Pixel& right) {
+    if (
+        (left.CheckState(PIXEL_EXISTS) || AtLeftBound(c)) &&
+        (right.CheckState(PIXEL_EXISTS) || AtRightBound(c))
+        ) {
         return false;
     }
     return true;
