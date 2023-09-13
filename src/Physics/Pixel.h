@@ -68,4 +68,10 @@ struct Pixel {
 	inline bool CheckState(int n) {
 		return (bitmask1 & n) == n;
 	}
+
+	inline bool CheckMaskedValue(int mask, int value) {
+		int maskedA = bitmask1 & mask;
+		int maskedB = value & mask;
+		return maskedA == maskedB;
+	}
 };

@@ -24,12 +24,15 @@ private:
 	int tileRows;
 	int tileCount;
 
+	bool parseRight = true;
+	int start, end, step;
+
 public:
 	Physics(Context* context);
 
 	void Tick(double deltaTime);
-	inline bool ParseSand(Raster& raster, Tile& tile, Pixel& pixel, coord& c, int index);
-	inline bool ParseWater(Raster& raster, Tile& tile, Pixel& pixel, coord& c, int index);
+	inline void ParseSand(Raster& raster, Tile& tile, Pixel& pixel, coord& c, int index);
+	inline void ParseWater(Raster& raster, Tile& tile, Pixel& pixel, coord& c, int index);
 
 	friend class Debug;
 
