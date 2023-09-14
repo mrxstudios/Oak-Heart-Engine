@@ -12,6 +12,11 @@ class Raster;
 class Tile;
 class Debug;
 
+struct swapMove {
+	Pixel& pixel;
+	coord c;
+};
+
 class Physics
 {
 private:
@@ -24,13 +29,17 @@ private:
 	int tileRows;
 	int tileCount;
 
-	bool parseRight = true;
+	bool parseForward = true;
 	int start, end, step;
+
+	coord moves[8];
+	int moveCount;
 
 public:
 	Physics(Context* context);
 
 	void Tick(double deltaTime);
+	inline void ParsePixel(Raster& raster, Tile& tile, const int x, const int y);
 	inline void ParseSand(Raster& raster, Tile& tile, Pixel& pixel, coord& c, int index);
 	inline void ParseWater(Raster& raster, Tile& tile, Pixel& pixel, coord& c, int index);
 
@@ -38,8 +47,10 @@ public:
 
 private:
 	void ParseColumn(Raster& raster, bounds& b);
-	inline bool PixelCanFall(coord c, Pixel& bottomLeft, Pixel& bottom, Pixel& bottomRight);
+	inline bool PixelCanSlide(coord c, Pixel& bottomLeft, Pixel& bottomRight);
 	inline bool PixelCanFloat(coord c, Pixel& left, Pixel& right);
+
+	inline void AddMove(coord c);
 
 	inline bool AtBounds(coord& c);
 	inline bool AtLeftBound(coord& c);

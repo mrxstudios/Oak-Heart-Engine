@@ -42,7 +42,7 @@ public:
     int RASTER_WIDTH = 200;
     int RASTER_HEIGHT = 150;
 
-    int CANVAS_MULTIPLIER = 2;
+    int CANVAS_MULTIPLIER = 4;
     int TOTAL_PIXELS = 30000;
 
     int TILE_SIZE = 64;
@@ -57,6 +57,8 @@ public:
     // Debugging
     char fpsTextBuffer[100];
     char msTextBuffer[100];
+    char pixelCountTextBuffer[100];
+
     bool debugFlags[4] { false,true,true,false};
 
     InputManager* inputManager;

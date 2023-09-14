@@ -37,7 +37,6 @@ public:
 	Pixel& operator[] (const int index);
 	
 	void SetPixel(coord& c, int value, uint8_t color);
-	void WakeNeighbors(const int index);
 
 	inline int GetTileIndex(coord& c);
 	inline int GetTileIndex(const int index);
@@ -47,7 +46,7 @@ public:
 	inline coord IndexToCoord(const int index);
 	inline int CoordToIndex(coord& c);
 
-	void SwapPixels(Tile& tile1, Tile& tile2, Pixel& pixel1, Pixel& pixel2, const int index1, const int index2);
+	void SwapPixels(Tile& tile1, Pixel& pixel1, coord c1, coord c2);
 	inline void SwapPixelValues(Pixel& a, Pixel& b);
 	
 	int GetTop(const int index);

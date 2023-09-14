@@ -43,12 +43,12 @@ void Raster::GenerateTiles() {
 
 			/*t */if (index >= columns) tile.neighbourIndices[0] = index - columns;
 			/*tr*/if ((index >= columns) && (index % columns < (columns - 1))) tile.neighbourIndices[1] = index - columns + 1;
-			/*r */if (index % columns < (columns - 1)) tile.neighbourIndices[2] = index + 1;
+			/*r */if ((index % columns) < (columns - 1)) tile.neighbourIndices[2] = index + 1;
 			/*br*/if ((index < (rows - 1) * columns) && (index % columns < (columns - 1))) tile.neighbourIndices[3] = index + columns + 1;
 			/*b */if (index < (rows - 1) * columns) tile.neighbourIndices[4] = index + columns;
 			/*bl*/if ((index < (rows - 1) * columns) && (index % columns > 0)) tile.neighbourIndices[5] = index + columns - 1;
-			/*l */if (index % columns > 0) tile.neighbourIndices[6] = index - 1;
-			/*tl*/if ((index % columns > 0) && (index >= columns)) tile.neighbourIndices[7] = index - columns - 1;
+			/*l */if ((index % columns) > 0) tile.neighbourIndices[6] = index - 1;
+			/*tl*/if (((index % columns) > 0) && (index >= columns)) tile.neighbourIndices[7] = index - columns - 1;
 		}
 	}
 }
@@ -125,7 +125,9 @@ void Raster::ResetTilesAndPixels() {
 				}
 			}
 		}
-
+	}
+	for (size_t i = 0; i < tileCount; i++) {
+		Tile& tile = tiles[i];
 		tile.shouldRender = false;
 		tile.updateBounds = { 0,0,0,0 };
 	}
@@ -159,11 +161,11 @@ int Raster::CoordToIndex(coord& c) {
 	return c.y * context->RASTER_WIDTH + c.x;
 }
 
-void Raster::SwapPixels(Tile& tile1, Tile& tile2, Pixel& pixel1, Pixel& pixel2, const int index1, const int index2) {
-	coord c1 = { index1 % context->RASTER_WIDTH, index1 / context->RASTER_WIDTH};
+void Raster::SwapPixels(Tile& tile1, Pixel& pixel1, coord c1, coord c2) {
+	Pixel& pixel2 = GetPixel(c2);
+	Tile& tile2 = GetTile(c2);
+
 	tile1.UpdateRenderBounds(c1);
-	
-	coord c2 = { index2 % context->RASTER_WIDTH, index2 / context->RASTER_WIDTH };
 	tile2.UpdateRenderBounds(c2);
 
 	pixel1.SetBit(PIXEL_UPDATED);
@@ -179,7 +181,7 @@ void Raster::SwapPixels(Tile& tile1, Tile& tile2, Pixel& pixel1, Pixel& pixel2, 
 		}
 	}
 
-	SwapPixelValues(pixels[index1], pixels[index2]);
+	SwapPixelValues(pixel1, pixel2);
 };
 
 void Raster::SwapPixelValues(Pixel& a, Pixel& b) {

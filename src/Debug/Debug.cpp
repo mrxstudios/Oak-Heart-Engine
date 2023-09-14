@@ -69,10 +69,7 @@ void Debug::RenderTiles() {
 			borderColor,
 			true
 		);
-	}
-	for (size_t y = 0; y < context->raster->rows; y++) {
-		for (size_t x = 0; x < context->raster->columns; x++) {
-			
-		}
+		sprintf_s(context->pixelCountTextBuffer, "%d", tile.occupiedPixels);
+		context->gameRenderer->DrawText(context->pixelCountTextBuffer, Point{ (tile.tileBounds.x2 - 2)*context->CANVAS_MULTIPLIER, (tile.tileBounds.y1 + 2)* context->CANVAS_MULTIPLIER }, SDL_Color{ 0,255,0,255 }, 10, TextAlignment::Right);
 	}
 }

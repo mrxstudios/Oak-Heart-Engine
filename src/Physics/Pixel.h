@@ -15,6 +15,9 @@
 #define PIXEL_TYPE_SAND 16
 #define PIXEL_TYPE_WATER 32
 
+#define PIXEL_SAND_EXISTS_DYNAMIC 21
+#define PIXEL_WATER_EXISTS_DYNAMIC 37
+
 
 struct Pixel {
 	uint8_t bitmask1 = 0;

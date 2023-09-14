@@ -18,6 +18,15 @@ struct ARGB {
 struct coord {
 	int x;
 	int y;
+
+	inline coord moveUp() const { return coord{ x, y - 1 }; }
+	inline coord moveDown() const { return coord{ x, y + 1 }; }
+	inline coord moveRight() const { return coord{ x + 1, y }; }
+	inline coord moveLeft() const { return coord{ x - 1, y }; }
+	inline coord moveUpRight() const { return coord{ x + 1, y - 1 }; }
+	inline coord moveDownRight() const { return coord{ x + 1, y + 1 }; }
+	inline coord moveDownLeft() const { return coord{ x - 1, y + 1 }; }
+	inline coord moveUpLeft() const { return coord{ x - 1, y - 1 }; }
 };
 
 struct bounds {
