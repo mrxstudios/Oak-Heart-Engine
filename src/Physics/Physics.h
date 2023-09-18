@@ -13,8 +13,8 @@ class Tile;
 class Debug;
 
 struct swapMove {
-	Pixel& pixel;
 	coord c;
+	Vector2D v;
 };
 
 class Physics
@@ -32,7 +32,7 @@ private:
 	bool parseForward = true;
 	int start, end, step;
 
-	coord moves[8];
+	swapMove moves[8];
 	int moveCount;
 
 public:
@@ -50,7 +50,7 @@ private:
 	inline bool PixelCanSlide(coord c, Pixel& bottomLeft, Pixel& bottomRight);
 	inline bool PixelCanFloat(coord c, Pixel& left, Pixel& right);
 
-	inline void AddMove(coord c);
+	inline void AddMove(coord c, Vector2D v);
 
 	inline bool AtBounds(coord& c);
 	inline bool AtLeftBound(coord& c);

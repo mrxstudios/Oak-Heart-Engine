@@ -52,6 +52,11 @@ struct Point {
 	int y;
 };
 
+struct Vector2D {
+	int x;
+	int y;
+};
+
 enum TextAlignment {
 	Left,
 	Center,

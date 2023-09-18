@@ -78,18 +78,18 @@ inline void Physics::ParseSand(Raster& raster, Tile& tile, Pixel& pixel, coord& 
         Pixel& bottomRightPixel = raster.GetPixel(cdr);
 
         // Move left down
-        if ((!bottomLeftPixel.CheckState(PIXEL_EXISTS) || bottomPixel.CheckState(PIXEL_TYPE_WATER)) && !AtLeftBound(c)) {
-            AddMove(cdl);
+        if ((!bottomLeftPixel.CheckState(PIXEL_EXISTS) || bottomLeftPixel.CheckState(PIXEL_TYPE_WATER)) && !AtLeftBound(c)) {
+            AddMove(cdl, {-1,0});
         }
 
         // Move down right
-        if ((!bottomRightPixel.CheckState(PIXEL_EXISTS) || bottomPixel.CheckState(PIXEL_TYPE_WATER)) && !AtRightBound(c)) {
-            AddMove(cdr);
+        if ((!bottomRightPixel.CheckState(PIXEL_EXISTS) || bottomRightPixel.CheckState(PIXEL_TYPE_WATER)) && !AtRightBound(c)) {
+            AddMove(cdr, { 1,0 });
         }
 
         if(moveCount > 0) {
             int randomMove = std::rand() % moveCount;
-            raster.SwapPixels(tile, pixel, c, moves[randomMove]);
+            raster.SwapPixels(tile, pixel, c, moves[randomMove].c);
         }
 
     }
@@ -122,17 +122,17 @@ inline void Physics::ParseWater(Raster& raster, Tile& tile, Pixel& pixel, coord&
 
     // Move left down
     if (!bottomLeftExists && !atLeftBound && !atBottomBound) {
-        AddMove(cdl);
+        AddMove(cdl, { -1, 0 });
         falling = true;
     }
 
     // Move down right
     if (!bottomRightExists && !atRightBound && !atBottomBound) {
-        AddMove(cdr);
+        AddMove(cdr, { 1,0 });
         falling = true;
     }
 
-    if (!falling) {
+    //if (!falling) {
         coord cl = c.moveLeft();
         coord cr = c.moveRight();
         Pixel& leftPixel = raster.GetPixel(cl);
@@ -140,28 +140,87 @@ inline void Physics::ParseWater(Raster& raster, Tile& tile, Pixel& pixel, coord&
         bool leftExists = leftPixel.CheckState(PIXEL_EXISTS);
         bool rightExists = rightPixel.CheckState(PIXEL_EXISTS);
 
+        // Start moving left
+        if (
+            !atLeftBound &&
+            rightExists &&
+            !leftExists &&
+            bottomLeftExists
+            ) {
+            AddMove(cl, { -1, pixel.getVectorY() });
+        }
+
+        // Start moving right
+        if (
+            !atRightBound &&
+            leftExists &&
+            !rightExists &&
+            bottomRightExists
+            ) {
+            AddMove(cr, { 1, pixel.getVectorY() });
+        }
+
+        // Keep moving left
+        if (
+            !atLeftBound &&
+            !rightExists &&
+            !leftExists &&
+            bottomLeftExists &&
+            pixel.getVectorX() < 0
+            ) {
+            AddMove(cl, { pixel.getVectorX(), pixel.getVectorY() });
+        }
+
+        // Keep moving right
+        if (
+            !atRightBound &&
+            !rightExists &&
+            !leftExists &&
+            bottomRightExists &&
+            pixel.getVectorX() > 0
+            ) {
+            AddMove(cr, { pixel.getVectorX(), pixel.getVectorY() });
+        }
+
+        /*
         // Move left
         if (
             !leftExists &&
             bottomLeftExists &&
-            !atLeftBound
+            !atLeftBound && 
+            pixel.getVectorX() < 0
         ) {
-            AddMove(cl);
+            if (rightExists) {
+                AddMove(cl, { -1, pixel.getVectorY() });
+            }
+            else {
+                AddMove(cl, { pixel.getVectorX(), pixel.getVectorY() });
+            }
         }
 
         // Move right
         if (
             !rightExists &&
             bottomRightExists &&
-            !atRightBound
+            !atRightBound &&
+            pixel.getVectorX() > 0
         ) {
-            AddMove(cr);
+            if (leftExists) {
+                AddMove(cr, { 1, pixel.getVectorY() });
+            }
+            else {
+                AddMove(cr, { pixel.getVectorX(), pixel.getVectorY() });
+            }
+
         }
-    }
+        */
+    //}
 
     if (moveCount > 0) {
         int randomMove = std::rand() % moveCount;
-        raster.SwapPixels(tile, pixel, c, moves[randomMove]);
+        swapMove move = moves[randomMove];
+        pixel.SetVectorX(move.v.x);
+        raster.SwapPixels(tile, pixel, c, move.c);
     }
 };
 
@@ -185,8 +244,8 @@ bool Physics::PixelCanFloat(coord c, Pixel& left, Pixel& right) {
     return true;
 }
 
-void Physics::AddMove(coord c) {
-    moves[moveCount] = c;
+void Physics::AddMove(coord c, Vector2D v) {
+    moves[moveCount] = { c, v };
     moveCount++;
 }
 
